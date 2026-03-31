@@ -1,0 +1,12 @@
+DROP TABLE IF EXISTS message_rules;
+DROP TABLE IF EXISTS drivers;
+DROP TABLE IF EXISTS vehicles;
+DROP TABLE IF EXISTS members;
+DROP TABLE IF EXISTS rate_plans;
+DROP TABLE IF EXISTS zones;
+DROP TABLE IF EXISTS lots;
+DROP TABLE IF EXISTS facilities;
+
+ALTER TABLE users DROP COLUMN IF EXISTS organization_id;
+
+DROP TABLE IF EXISTS organizations;

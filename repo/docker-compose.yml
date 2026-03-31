@@ -1,0 +1,44 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      APP_ADDR: ":8080"
+      APP_ENV: ${APP_ENV:-development}
+      DATABASE_URL: postgres://parkops:parkops@127.0.0.1:5432/parkops?sslmode=disable
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff}
+      SESSION_SECRET: ${SESSION_SECRET:-dev-session-secret}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    network_mode: host
+    environment:
+      TEST_DATABASE_URL: postgres://parkops:parkops@127.0.0.1:5432/parkops?sslmode=disable
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: ["test"]
+
+  db:
+    image: postgres:16
+    network_mode: host
+    environment:
+      POSTGRES_USER: parkops
+      POSTGRES_PASSWORD: parkops
+      POSTGRES_DB: parkops
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U parkops"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

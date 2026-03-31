@@ -1,0 +1,565 @@
+basePath: /api
+host: localhost:8080
+info:
+  contact: {}
+  description: ParkOps Command & Reservation Platform - offline-first parking operations
+  title: ParkOps API
+  version: "1.0"
+paths:
+  /drivers:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      security:
+      - SessionCookie: []
+      summary: List drivers
+      tags:
+      - Master Data
+    post:
+      consumes:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Create driver
+      tags:
+      - Master Data
+  /drivers/{id}:
+    delete:
+      responses:
+        "204":
+          description: No Content
+      security:
+      - SessionCookie: []
+      summary: Delete driver
+      tags:
+      - Master Data
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Get driver
+      tags:
+      - Master Data
+    patch:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Update driver
+      tags:
+      - Master Data
+  /facilities:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      security:
+      - SessionCookie: []
+      summary: List facilities
+      tags:
+      - Master Data
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Create facility
+      tags:
+      - Master Data
+  /facilities/{id}:
+    delete:
+      responses:
+        "204":
+          description: No Content
+      security:
+      - SessionCookie: []
+      summary: Delete facility
+      tags:
+      - Master Data
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Get facility
+      tags:
+      - Master Data
+    patch:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Update facility
+      tags:
+      - Master Data
+  /lots:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      security:
+      - SessionCookie: []
+      summary: List lots
+      tags:
+      - Master Data
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Create lot
+      tags:
+      - Master Data
+  /lots/{id}:
+    delete:
+      responses:
+        "204":
+          description: No Content
+      security:
+      - SessionCookie: []
+      summary: Delete lot
+      tags:
+      - Master Data
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Get lot
+      tags:
+      - Master Data
+    patch:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Update lot
+      tags:
+      - Master Data
+  /members:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: List members
+      tags:
+      - Master Data
+    post:
+      consumes:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Create member
+      tags:
+      - Master Data
+  /members/{id}:
+    delete:
+      responses:
+        "204":
+          description: No Content
+      security:
+      - SessionCookie: []
+      summary: Delete member
+      tags:
+      - Master Data
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Get member
+      tags:
+      - Master Data
+    patch:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Update member
+      tags:
+      - Master Data
+  /members/{id}/balance:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Get member balance
+      tags:
+      - Master Data
+    patch:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Patch member balance
+      tags:
+      - Master Data
+  /message-rules:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      security:
+      - SessionCookie: []
+      summary: List message rules
+      tags:
+      - Master Data
+    post:
+      consumes:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Create message rule
+      tags:
+      - Master Data
+  /message-rules/{id}:
+    delete:
+      responses:
+        "204":
+          description: No Content
+      security:
+      - SessionCookie: []
+      summary: Delete message rule
+      tags:
+      - Master Data
+    patch:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Update message rule
+      tags:
+      - Master Data
+  /rate-plans:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      security:
+      - SessionCookie: []
+      summary: List rate plans
+      tags:
+      - Master Data
+    post:
+      consumes:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Create rate plan
+      tags:
+      - Master Data
+  /rate-plans/{id}:
+    delete:
+      responses:
+        "204":
+          description: No Content
+      security:
+      - SessionCookie: []
+      summary: Delete rate plan
+      tags:
+      - Master Data
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Get rate plan
+      tags:
+      - Master Data
+    patch:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Update rate plan
+      tags:
+      - Master Data
+  /vehicles:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      security:
+      - SessionCookie: []
+      summary: List vehicles
+      tags:
+      - Master Data
+    post:
+      consumes:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Create vehicle
+      tags:
+      - Master Data
+  /vehicles/{id}:
+    delete:
+      responses:
+        "204":
+          description: No Content
+      security:
+      - SessionCookie: []
+      summary: Delete vehicle
+      tags:
+      - Master Data
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Get vehicle
+      tags:
+      - Master Data
+    patch:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Update vehicle
+      tags:
+      - Master Data
+  /zones:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      security:
+      - SessionCookie: []
+      summary: List zones
+      tags:
+      - Master Data
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Create zone
+      tags:
+      - Master Data
+  /zones/{id}:
+    delete:
+      responses:
+        "204":
+          description: No Content
+      security:
+      - SessionCookie: []
+      summary: Delete zone
+      tags:
+      - Master Data
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Get zone
+      tags:
+      - Master Data
+    patch:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - SessionCookie: []
+      summary: Update zone
+      tags:
+      - Master Data
+securityDefinitions:
+  SessionCookie:
+    in: cookie
+    name: session_id
+    type: apiKey
+swagger: "2.0"
