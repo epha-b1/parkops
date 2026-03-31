@@ -28,6 +28,7 @@ func NewRouter(logger *slog.Logger, pool *pgxpool.Pool, encryptionKey []byte) *g
 	registerDeviceRoutes(r, authService, pool)
 	registerTrackingRoutes(r, authService, pool)
 	registerNotificationRoutes(r, authService, pool)
+	registerCampaignRoutes(r, authService, pool)
 
 	r.GET("/login", gin.WrapH(templ.Handler(web.LoginPage())))
 	pages := r.Group("")
@@ -65,6 +66,9 @@ func NewRouter(logger *slog.Logger, pool *pgxpool.Pool, encryptionKey []byte) *g
 		})
 		pages.GET("/notifications", func(c *gin.Context) {
 			renderPage(c, web.ListPage(toWebUser(c), "Notifications", "/notifications", "/api/notifications"))
+		})
+		pages.GET("/campaigns", func(c *gin.Context) {
+			renderPage(c, web.ListPage(toWebUser(c), "Campaigns", "/campaigns", "/api/campaigns"))
 		})
 		pages.GET("/audit", func(c *gin.Context) {
 			renderPage(c, web.ListPage(toWebUser(c), "Audit Log", "/audit", "/api/admin/audit-logs"))

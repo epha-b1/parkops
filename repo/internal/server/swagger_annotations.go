@@ -633,3 +633,93 @@ func swaggerNotificationExportsList() {}
 // @Success 200 {object} map[string]interface{}
 // @Router /notifications/export-packages/{id}/download [get]
 func swaggerNotificationExportsDownload() {}
+
+// @Summary List campaigns
+// @Tags Campaigns
+// @Security SessionCookie
+// @Produce json
+// @Success 200 {array} map[string]interface{}
+// @Router /campaigns [get]
+func swaggerCampaignsList() {}
+
+// @Summary Create campaign
+// @Tags Campaigns
+// @Security SessionCookie
+// @Accept json
+// @Produce json
+// @Success 201 {object} map[string]interface{}
+// @Router /campaigns [post]
+func swaggerCampaignsCreate() {}
+
+// @Summary Get campaign
+// @Tags Campaigns
+// @Security SessionCookie
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /campaigns/{id} [get]
+func swaggerCampaignsGet() {}
+
+// @Summary Patch campaign
+// @Tags Campaigns
+// @Security SessionCookie
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /campaigns/{id} [patch]
+func swaggerCampaignsPatch() {}
+
+// @Summary Delete campaign
+// @Tags Campaigns
+// @Security SessionCookie
+// @Success 204
+// @Router /campaigns/{id} [delete]
+func swaggerCampaignsDelete() {}
+
+// @Summary List campaign tasks
+// @Tags Campaigns
+// @Security SessionCookie
+// @Produce json
+// @Success 200 {array} map[string]interface{}
+// @Router /campaigns/{id}/tasks [get]
+func swaggerCampaignTasksList() {}
+
+// @Summary Create campaign task
+// @Tags Campaigns
+// @Security SessionCookie
+// @Accept json
+// @Produce json
+// @Success 201 {object} map[string]interface{}
+// @Router /campaigns/{id}/tasks [post]
+func swaggerCampaignTasksCreate() {}
+
+// @Summary Get task
+// @Tags Campaigns
+// @Security SessionCookie
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /tasks/{id} [get]
+func swaggerTaskGet() {}
+
+// @Summary Patch task
+// @Tags Campaigns
+// @Security SessionCookie
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /tasks/{id} [patch]
+func swaggerTaskPatch() {}
+
+// @Summary Delete task
+// @Tags Campaigns
+// @Security SessionCookie
+// @Success 204
+// @Router /tasks/{id} [delete]
+func swaggerTaskDelete() {}
+
+// @Summary Complete task
+// @Tags Campaigns
+// @Security SessionCookie
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /tasks/{id}/complete [post]
+func swaggerTaskComplete() {}

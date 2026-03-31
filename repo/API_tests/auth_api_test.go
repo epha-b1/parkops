@@ -67,6 +67,8 @@ func resetAuthData(t *testing.T, pool *pgxpool.Pool) {
 	ctx := context.Background()
 	_, err := pool.Exec(ctx, `
 		TRUNCATE TABLE
+			tasks,
+			campaigns,
 			notification_jobs,
 			notifications,
 			notification_subscriptions,
@@ -160,7 +162,7 @@ func resetAuthData(t *testing.T, pool *pgxpool.Pool) {
 
 	_, err = pool.Exec(ctx, `
 		INSERT INTO notification_topics(name)
-		VALUES ('booking_success'), ('booking_changed'), ('expiry_approaching'), ('arrears_reminder')
+		VALUES ('booking_success'), ('booking_changed'), ('expiry_approaching'), ('arrears_reminder'), ('task_reminder')
 		ON CONFLICT (name) DO NOTHING
 	`)
 	if err != nil {

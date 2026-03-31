@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"parkops/internal/auth"
+	"parkops/internal/campaigns"
 	"parkops/internal/config"
 	"parkops/internal/db"
 	"parkops/internal/notifications"
@@ -56,6 +57,8 @@ func main() {
 	go reconciliation.StartScheduler(ctx, logger, reconcileService)
 	notificationService := notifications.NewService(pool)
 	go notifications.StartProcessor(ctx, logger, notificationService)
+	campaignService := campaigns.NewService(pool)
+	go campaigns.StartReminderScheduler(ctx, logger, campaignService)
 
 	httpServer := &http.Server{
 		Addr:              cfg.AppAddr,
