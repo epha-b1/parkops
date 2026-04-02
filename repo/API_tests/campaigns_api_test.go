@@ -162,3 +162,72 @@ func TestCampaignAndTaskCRUDEndpoints(t *testing.T) {
 		t.Fatalf("delete campaign failed: %d %s", deleteCampaign.Code, deleteCampaign.Body.String())
 	}
 }
+
+func TestCampaignTaskReminderHonorsDND(t *testing.T) {
+	env := setupAuthAPIEnv(t)
+	admin := loginAs(t, env, "admin", "AdminPass1234")
+
+	topics := apiRequest(t, env.r, http.MethodGet, "/api/notification-topics", nil, admin)
+	logStep(t, "GET", "/api/notification-topics", topics.Code, topics.Body.String())
+	if topics.Code != http.StatusOK {
+		t.Fatalf("topics failed: %d %s", topics.Code, topics.Body.String())
+	}
+	topicID := topicIDByName(t, topics.Body.String(), "task_reminder")
+
+	sub := apiRequest(t, env.r, http.MethodPost, "/api/notification-topics/"+topicID+"/subscribe", nil, admin)
+	logStep(t, "POST", "/api/notification-topics/:id/subscribe", sub.Code, sub.Body.String())
+	if sub.Code != http.StatusOK {
+		t.Fatalf("subscribe failed: %d %s", sub.Code, sub.Body.String())
+	}
+
+	setDND := apiRequest(t, env.r, http.MethodPatch, "/api/notification-settings/dnd", map[string]any{
+		"start_time": "00:00",
+		"end_time":   "23:59",
+		"enabled":    true,
+	}, admin)
+	logStep(t, "PATCH", "/api/notification-settings/dnd", setDND.Code, setDND.Body.String())
+	if setDND.Code != http.StatusOK {
+		t.Fatalf("set dnd failed: %d %s", setDND.Code, setDND.Body.String())
+	}
+
+	createCampaign := apiRequest(t, env.r, http.MethodPost, "/api/campaigns", map[string]any{
+		"title":       "DND Ops Checks",
+		"description": "dnd task reminders",
+	}, admin)
+	logStep(t, "POST", "/api/campaigns", createCampaign.Code, createCampaign.Body.String())
+	if createCampaign.Code != http.StatusCreated {
+		t.Fatalf("create campaign failed: %d %s", createCampaign.Code, createCampaign.Body.String())
+	}
+	campaignID := extractID(t, createCampaign.Body.String())
+
+	createTask := apiRequest(t, env.r, http.MethodPost, "/api/campaigns/"+campaignID+"/tasks", map[string]any{
+		"description":               "Check gate B",
+		"deadline":                  time.Now().UTC().Add(-2 * time.Hour).Format(time.RFC3339),
+		"reminder_interval_minutes": 1,
+	}, admin)
+	logStep(t, "POST", "/api/campaigns/:id/tasks", createTask.Code, createTask.Body.String())
+	if createTask.Code != http.StatusCreated {
+		t.Fatalf("create task failed: %d %s", createTask.Code, createTask.Body.String())
+	}
+	taskID := extractID(t, createTask.Body.String())
+
+	processor := campaigns.NewService(env.pool)
+	if err := processor.ProcessDueTaskReminders(context.Background(), time.Now().UTC()); err != nil {
+		t.Fatalf("process reminders failed: %v", err)
+	}
+
+	var deferred int
+	err := env.pool.QueryRow(context.Background(), `
+		SELECT COUNT(*)
+		FROM notification_jobs
+		WHERE payload->>'task_id'=$1
+		  AND status='deferred'
+		  AND next_attempt_at IS NOT NULL
+	`, taskID).Scan(&deferred)
+	if err != nil {
+		t.Fatalf("query deferred task reminders: %v", err)
+	}
+	if deferred == 0 {
+		t.Fatal("expected deferred task reminder job while DND is active")
+	}
+}

@@ -39,7 +39,7 @@ func DashboardPage(user CurrentUser) templ.Component {
 
     <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
       <h2 class="text-lg font-semibold">Activity feed</h2>
-      <p class="mt-3 text-sm text-slate-600">Live feed - coming in Slice 7.</p>
+      <p class="mt-3 text-sm text-slate-600">Recent activity snapshot from polling the live APIs.</p>
       <p class="mt-2 text-xs text-slate-500" id="activityStamp">Waiting for first poll...</p>
     </article>
   </section>

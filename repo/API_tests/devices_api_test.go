@@ -221,3 +221,29 @@ func TestLateEventFlag(t *testing.T) {
 		t.Fatalf("expected late=true on stale out-of-order event, got %d %s", late.Code, late.Body.String())
 	}
 }
+
+func TestDeviceEventInvalidSignatureNotTrusted(t *testing.T) {
+	env := setupAuthAPIEnv(t)
+	admin := loginAs(t, env, "admin", "AdminPass1234")
+	deviceID, _ := createDeviceWithZone(t, env, admin)
+
+	deviceTime := time.Now().UTC().Truncate(time.Second).Format(time.RFC3339)
+	created := apiRequest(t, env.r, http.MethodPost, "/api/device-events", map[string]any{
+		"device_id":             deviceID,
+		"event_key":             "ev-invalid-signature",
+		"sequence_number":       11,
+		"event_type":            "camera_ping",
+		"device_time":           deviceTime,
+		"device_time_signature": "invalid-signature",
+	}, admin)
+	logStep(t, "POST", "/api/device-events", created.Code, created.Body.String())
+	if created.Code != http.StatusCreated {
+		t.Fatalf("expected device event create 201, got %d %s", created.Code, created.Body.String())
+	}
+
+	list := apiRequest(t, env.r, http.MethodGet, "/api/device-events?device_id="+deviceID, nil, admin)
+	logStep(t, "GET", "/api/device-events", list.Code, list.Body.String())
+	if list.Code != http.StatusOK || !strings.Contains(list.Body.String(), "ev-invalid-signature") || !strings.Contains(list.Body.String(), `"device_time_trusted":false`) {
+		t.Fatalf("expected event listed as untrusted, got %d %s", list.Code, list.Body.String())
+	}
+}

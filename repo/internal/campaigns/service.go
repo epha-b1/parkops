@@ -8,6 +8,8 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"parkops/internal/notifications"
 )
 
 type Service struct {
@@ -78,6 +80,19 @@ func (s *Service) ProcessDueTaskReminders(ctx context.Context, now time.Time) er
 
 	for _, task := range tasks {
 		for _, userID := range userIDs {
+			var startT, endT time.Time
+			var dndEnabled bool
+			err := tx.QueryRow(ctx, `
+				SELECT start_time::time, end_time::time, enabled
+				FROM user_dnd_settings
+				WHERE user_id = $1::uuid
+			`, userID).Scan(&startT, &endT, &dndEnabled)
+			if err == pgx.ErrNoRows {
+				dndEnabled = false
+			} else if err != nil {
+				return err
+			}
+
 			var notificationID string
 			err := tx.QueryRow(ctx, `
 				INSERT INTO notifications(user_id, topic_id, title, body, created_at)
@@ -89,10 +104,16 @@ func (s *Service) ProcessDueTaskReminders(ctx context.Context, now time.Time) er
 			}
 
 			payload, _ := json.Marshal(map[string]any{"recipient": userID, "task_id": task.ID})
+			status := "pending"
+			nextAttemptAt := any(nil)
+			if dndEnabled && notifications.InDNDWindow(now.UTC(), startT, endT) {
+				status = "deferred"
+				nextAttemptAt = notifications.DNDEnd(now.UTC(), startT, endT)
+			}
 			_, err = tx.Exec(ctx, `
-				INSERT INTO notification_jobs(notification_id, user_id, topic_id, channel, status, attempt_count, payload, created_at, updated_at)
-				VALUES ($1::uuid, $2::uuid, $3::uuid, 'in_app', 'pending', 0, $4::jsonb, $5, $5)
-			`, notificationID, userID, topicID, string(payload), now.UTC())
+				INSERT INTO notification_jobs(notification_id, user_id, topic_id, channel, status, attempt_count, next_attempt_at, payload, created_at, updated_at)
+				VALUES ($1::uuid, $2::uuid, $3::uuid, 'in_app', $4, 0, $5, $6::jsonb, $7, $7)
+			`, notificationID, userID, topicID, status, nextAttemptAt, string(payload), now.UTC())
 			if err != nil {
 				return err
 			}

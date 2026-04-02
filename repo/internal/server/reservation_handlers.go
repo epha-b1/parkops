@@ -607,6 +607,12 @@ func (h *reservationHandler) reservationStatsToday(c *gin.Context) {
 }
 
 func (h *reservationHandler) listReservations(c *gin.Context) {
+	user, ok := getCurrentUser(c)
+	if !ok {
+		abortAPIError(c, http.StatusUnauthorized, "UNAUTHORIZED", "authentication required")
+		return
+	}
+
 	status := strings.TrimSpace(c.Query("status"))
 	limit := parseIntDefault(c.Query("limit"), 50)
 	if limit <= 0 || limit > 200 {
@@ -625,12 +631,25 @@ func (h *reservationHandler) listReservations(c *gin.Context) {
 			r.stall_count,
 			h.expires_at
 		FROM reservations r
+		JOIN members m ON m.id = r.member_id
 		LEFT JOIN capacity_holds h ON h.reservation_id = r.id AND h.released_at IS NULL
 	`
 	args := []any{}
+	where := make([]string, 0)
+	if auth.HasAnyRole(user.Roles, []string{auth.RoleFleetManager}) {
+		if user.OrganizationID == nil {
+			abortAPIError(c, http.StatusForbidden, "FORBIDDEN", "forbidden")
+			return
+		}
+		args = append(args, *user.OrganizationID)
+		where = append(where, "m.organization_id = $"+strconv.Itoa(len(args))+"::uuid")
+	}
 	if status != "" {
-		query += ` WHERE r.status = $1`
 		args = append(args, status)
+		where = append(where, "r.status = $"+strconv.Itoa(len(args)))
+	}
+	if len(where) > 0 {
+		query += ` WHERE ` + strings.Join(where, " AND ")
 	}
 	query += ` ORDER BY r.created_at DESC LIMIT $` + strconv.Itoa(len(args)+1)
 	args = append(args, limit)

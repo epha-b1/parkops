@@ -52,8 +52,9 @@ func AppLayout(user CurrentUser, pageTitle, currentPath, contentHTML string) tem
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>%s - ParkOps</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <style>
+		:root{--bg:#f1f5f9;--panel:#fff;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;--brand:#047857}
+		body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
     .toast-container{position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem;pointer-events:none}
     .toast{pointer-events:auto;min-width:280px;max-width:380px;padding:.75rem 1rem;border-radius:.5rem;font-size:.875rem;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,.15);display:flex;align-items:center;gap:.5rem;animation:toast-in .3s ease-out,toast-out .3s ease-in 3.7s forwards}
     .toast-success{background:#065f46;color:#fff}

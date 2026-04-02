@@ -111,6 +111,10 @@ func (h *segmentHandler) deleteTag(c *gin.Context) {
 }
 
 func (h *segmentHandler) getMemberTags(c *gin.Context) {
+	if !h.assertMemberScope(c, c.Param("id")) {
+		return
+	}
+
 	rows, err := h.pool.Query(c.Request.Context(), `
 		SELECT t.id::text, t.name
 		FROM member_tags mt
@@ -151,6 +155,9 @@ func (h *segmentHandler) addMemberTag(c *gin.Context) {
 		abortAPIError(c, 400, "VALIDATION_ERROR", "member id must be a valid UUID")
 		return
 	}
+	if !h.assertMemberScope(c, c.Param("id")) {
+		return
+	}
 	actor, _ := getCurrentUser(c)
 	memberID := c.Param("id")
 	_, err := h.pool.Exec(c.Request.Context(), `
@@ -167,6 +174,10 @@ func (h *segmentHandler) addMemberTag(c *gin.Context) {
 }
 
 func (h *segmentHandler) removeMemberTag(c *gin.Context) {
+	if !h.assertMemberScope(c, c.Param("id")) {
+		return
+	}
+
 	actor, _ := getCurrentUser(c)
 	memberID := c.Param("id")
 	tagID := c.Param("tagId")
@@ -179,6 +190,37 @@ func (h *segmentHandler) removeMemberTag(c *gin.Context) {
 	}
 	_ = h.authService.WriteAuditLog(c.Request.Context(), &actor.ID, "member_tag_remove", "member", &memberID, map[string]any{"tag_id": tagID})
 	c.JSON(http.StatusOK, gin.H{"message": "tag removed"})
+}
+
+func (h *segmentHandler) assertMemberScope(c *gin.Context, memberID string) bool {
+	actor, ok := getCurrentUser(c)
+	if !ok {
+		abortAPIError(c, http.StatusUnauthorized, "UNAUTHORIZED", "authentication required")
+		return false
+	}
+	if !auth.HasAnyRole(actor.Roles, []string{auth.RoleFleetManager}) {
+		return true
+	}
+	if actor.OrganizationID == nil {
+		abortAPIError(c, http.StatusForbidden, "FORBIDDEN", "forbidden")
+		return false
+	}
+
+	var orgID string
+	err := h.pool.QueryRow(c.Request.Context(), `SELECT organization_id::text FROM members WHERE id=$1::uuid`, memberID).Scan(&orgID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			abortAPIError(c, http.StatusNotFound, "NOT_FOUND", "resource not found")
+		} else {
+			abortAPIError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "internal server error")
+		}
+		return false
+	}
+	if orgID != *actor.OrganizationID {
+		abortAPIError(c, http.StatusForbidden, "FORBIDDEN", "forbidden")
+		return false
+	}
+	return true
 }
 
 // ── Tag Export / Import ──

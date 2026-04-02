@@ -44,6 +44,12 @@ type positionRow struct {
 }
 
 func (h *trackingHandler) submitLocation(c *gin.Context) {
+	actor, ok := getCurrentUser(c)
+	if !ok {
+		abortAPIError(c, http.StatusUnauthorized, "UNAUTHORIZED", "authentication required")
+		return
+	}
+
 	var b struct {
 		VehicleID           string  `json:"vehicle_id"`
 		Latitude            float64 `json:"latitude"`
@@ -80,7 +86,11 @@ func (h *trackingHandler) submitLocation(c *gin.Context) {
 	defer tx.Rollback(c.Request.Context())
 
 	var plateNumber string
+	var vehicleOrg string
 	err = tx.QueryRow(c.Request.Context(), `SELECT plate_number FROM vehicles WHERE id=$1`, b.VehicleID).Scan(&plateNumber)
+	if err == nil {
+		err = tx.QueryRow(c.Request.Context(), `SELECT organization_id::text FROM vehicles WHERE id=$1`, b.VehicleID).Scan(&vehicleOrg)
+	}
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			abortAPIError(c, http.StatusNotFound, "NOT_FOUND", "resource not found")
@@ -88,6 +98,12 @@ func (h *trackingHandler) submitLocation(c *gin.Context) {
 		}
 		abortAPIError(c, 500, "INTERNAL_ERROR", "internal server error")
 		return
+	}
+	if auth.HasAnyRole(actor.Roles, []string{auth.RoleFleetManager}) {
+		if actor.OrganizationID == nil || *actor.OrganizationID != vehicleOrg {
+			abortAPIError(c, http.StatusForbidden, "FORBIDDEN", "forbidden")
+			return
+		}
 	}
 
 	deviceTimeTrusted := false
@@ -278,6 +294,10 @@ func (h *trackingHandler) maybeCreateStopEvent(c *gin.Context, tx pgx.Tx, vehicl
 }
 
 func (h *trackingHandler) listVehiclePositions(c *gin.Context) {
+	if !h.assertTrackingVehicleScope(c, c.Param("id")) {
+		return
+	}
+
 	vehicleID := strings.TrimSpace(c.Param("id"))
 	if vehicleID == "" {
 		abortAPIError(c, http.StatusBadRequest, "VALIDATION_ERROR", "vehicle id is required")
@@ -357,6 +377,10 @@ func (h *trackingHandler) listVehiclePositions(c *gin.Context) {
 }
 
 func (h *trackingHandler) listVehicleStops(c *gin.Context) {
+	if !h.assertTrackingVehicleScope(c, c.Param("id")) {
+		return
+	}
+
 	rows, err := h.pool.Query(c.Request.Context(), `
 		SELECT id::text, started_at, detected_at, latitude, longitude
 		FROM stop_events
@@ -394,4 +418,35 @@ func (h *trackingHandler) listVehicleStops(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"items": items, "total": len(items)})
+}
+
+func (h *trackingHandler) assertTrackingVehicleScope(c *gin.Context, vehicleID string) bool {
+	actor, ok := getCurrentUser(c)
+	if !ok {
+		abortAPIError(c, http.StatusUnauthorized, "UNAUTHORIZED", "authentication required")
+		return false
+	}
+	if !auth.HasAnyRole(actor.Roles, []string{auth.RoleFleetManager}) {
+		return true
+	}
+	if actor.OrganizationID == nil {
+		abortAPIError(c, http.StatusForbidden, "FORBIDDEN", "forbidden")
+		return false
+	}
+
+	var vehicleOrg string
+	err := h.pool.QueryRow(c.Request.Context(), `SELECT organization_id::text FROM vehicles WHERE id=$1`, vehicleID).Scan(&vehicleOrg)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			abortAPIError(c, http.StatusNotFound, "NOT_FOUND", "resource not found")
+		} else {
+			abortAPIError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "internal server error")
+		}
+		return false
+	}
+	if vehicleOrg != *actor.OrganizationID {
+		abortAPIError(c, http.StatusForbidden, "FORBIDDEN", "forbidden")
+		return false
+	}
+	return true
 }

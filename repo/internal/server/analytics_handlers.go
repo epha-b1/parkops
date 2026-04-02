@@ -209,10 +209,24 @@ func (h *analyticsHandler) exceptions(c *gin.Context) {
 }
 
 func (h *analyticsHandler) listExports(c *gin.Context) {
-	rows, err := h.pool.Query(c.Request.Context(), `
+	actor, ok := getCurrentUser(c)
+	if !ok {
+		abortAPIError(c, http.StatusUnauthorized, "UNAUTHORIZED", "authentication required")
+		return
+	}
+
+	query := `
 		SELECT id::text, requested_by::text, format, scope, status, created_at, completed_at
-		FROM exports ORDER BY created_at DESC
-	`)
+		FROM exports
+	`
+	args := []any{}
+	if !auth.HasAnyRole(actor.Roles, []string{auth.RoleFacilityAdmin}) {
+		query += ` WHERE requested_by = $1::uuid`
+		args = append(args, actor.ID)
+	}
+	query += ` ORDER BY created_at DESC`
+
+	rows, err := h.pool.Query(c.Request.Context(), query, args...)
 	if err != nil {
 		abortAPIError(c, 500, "INTERNAL_ERROR", "internal server error")
 		return
@@ -255,7 +269,7 @@ func (h *analyticsHandler) createExport(c *gin.Context) {
 		abortAPIError(c, 400, "VALIDATION_ERROR", "format and scope required")
 		return
 	}
-	validFormats := map[string]bool{"csv": true, "excel": true, "pdf": true}
+	validFormats := map[string]bool{"csv": true}
 	validScopes := map[string]bool{"occupancy": true, "bookings": true, "exceptions": true}
 	if !validFormats[b.Format] || !validScopes[b.Scope] {
 		abortAPIError(c, 400, "VALIDATION_ERROR", "invalid format or scope")
@@ -269,6 +283,10 @@ func (h *analyticsHandler) createExport(c *gin.Context) {
 		var exists bool
 		err := h.pool.QueryRow(c.Request.Context(), `SELECT EXISTS(SELECT 1 FROM segment_definitions WHERE id=$1::uuid)`, *b.SegmentID).Scan(&exists)
 		if err != nil || !exists {
+			abortAPIError(c, 403, "FORBIDDEN", "segment access denied")
+			return
+		}
+		if !auth.HasAnyRole(actor.Roles, []string{auth.RoleFacilityAdmin}) {
 			abortAPIError(c, 403, "FORBIDDEN", "segment access denied")
 			return
 		}
@@ -293,7 +311,7 @@ func (h *analyticsHandler) createExport(c *gin.Context) {
 		segmentID = *b.SegmentID
 	}
 
-	// Create export record and generate CSV inline (synchronous for simplicity)
+	// Create export record and generate content inline.
 	var id string
 	err := h.pool.QueryRow(c.Request.Context(), `
 		INSERT INTO exports(requested_by, format, scope, segment_id, query_from, query_to, status)
@@ -305,99 +323,154 @@ func (h *analyticsHandler) createExport(c *gin.Context) {
 		return
 	}
 
-	// Generate CSV content
-	csvContent, err := h.generateCSV(c, b.Scope, queryFrom, queryTo)
+	content, truncated, err := h.generateExportContent(c, b.Format, b.Scope, queryFrom, queryTo)
 	if err != nil {
 		_, _ = h.pool.Exec(c.Request.Context(), `UPDATE exports SET status='failed', completed_at=now() WHERE id=$1::uuid`, id)
 		abortAPIError(c, 500, "INTERNAL_ERROR", "export generation failed")
 		return
 	}
 
-	// Store CSV content as file_path (we store inline content in the DB for simplicity)
 	_, err = h.pool.Exec(c.Request.Context(), `
 		UPDATE exports SET status='ready', file_path=$2, completed_at=now() WHERE id=$1::uuid
-	`, id, csvContent)
+	`, id, content)
 	if err != nil {
 		abortAPIError(c, 500, "INTERNAL_ERROR", "internal server error")
 		return
 	}
 
-	_ = h.authService.WriteAuditLog(c.Request.Context(), &actor.ID, "export_create", "export", &id, map[string]any{"format": b.Format, "scope": b.Scope})
-	c.JSON(http.StatusCreated, gin.H{"id": id, "format": b.Format, "scope": b.Scope, "status": "ready", "created_at": time.Now().UTC().Format(timeRFC3339)})
+	_ = h.authService.WriteAuditLog(c.Request.Context(), &actor.ID, "export_create", "export", &id, map[string]any{"format": b.Format, "scope": b.Scope, "truncated": truncated})
+
+	c.JSON(http.StatusCreated, gin.H{"id": id, "format": b.Format, "scope": b.Scope, "status": "ready", "truncated": truncated, "created_at": time.Now().UTC().Format(timeRFC3339)})
 }
 
-func (h *analyticsHandler) generateCSV(c *gin.Context, scope string, from, to any) (string, error) {
+func (h *analyticsHandler) generateExportContent(c *gin.Context, format, scope string, from, to any) (string, bool, error) {
+	limit := 0
+
+	headers, rows, totalRows, err := h.fetchExportRows(c, scope, limit)
+	if err != nil {
+		return "", false, err
+	}
+	truncated := limit > 0 && totalRows > limit
+
+	if format != "csv" {
+		return "", false, fmt.Errorf("unsupported format")
+	}
+
 	var buf bytes.Buffer
 	w := csv.NewWriter(&buf)
+	if truncated {
+		_ = w.Write([]string{fmt.Sprintf("NOTE: truncated export from %d to %d rows", totalRows, len(rows))})
+	}
+	_ = w.Write(headers)
+	for _, row := range rows {
+		_ = w.Write(row)
+	}
+	w.Flush()
+	return buf.String(), truncated, nil
+}
+
+func (h *analyticsHandler) fetchExportRows(c *gin.Context, scope string, limit int) ([]string, [][]string, int, error) {
+	var buf bytes.Buffer
+	_ = buf
 
 	ctx := c.Request.Context()
 	switch scope {
 	case "occupancy":
-		_ = w.Write([]string{"snapshot_at", "zone_id", "authoritative_stalls"})
-		rows, err := h.pool.Query(ctx, `
-			SELECT cs.snapshot_at, cs.zone_id::text, cs.authoritative_stalls
-			FROM capacity_snapshots cs ORDER BY cs.snapshot_at DESC LIMIT 10000
-		`)
+		var total int
+		if err := h.pool.QueryRow(ctx, `SELECT COUNT(*) FROM capacity_snapshots`).Scan(&total); err != nil {
+			return nil, nil, 0, err
+		}
+		query := `SELECT cs.snapshot_at, cs.zone_id::text, cs.authoritative_stalls FROM capacity_snapshots cs ORDER BY cs.snapshot_at DESC`
+		args := []any{}
+		if limit > 0 {
+			query += ` LIMIT $1`
+			args = append(args, limit)
+		}
+		rows, err := h.pool.Query(ctx, query, args...)
 		if err != nil {
-			return "", err
+			return nil, nil, 0, err
 		}
 		defer rows.Close()
+		out := make([][]string, 0)
 		for rows.Next() {
 			var at time.Time
 			var zoneID string
 			var stalls int
 			if err := rows.Scan(&at, &zoneID, &stalls); err != nil {
-				return "", err
+				return nil, nil, 0, err
 			}
-			_ = w.Write([]string{at.UTC().Format(timeRFC3339), zoneID, fmt.Sprintf("%d", stalls)})
+			out = append(out, []string{at.UTC().Format(timeRFC3339), zoneID, fmt.Sprintf("%d", stalls)})
 		}
+		return []string{"snapshot_at", "zone_id", "authoritative_stalls"}, out, total, nil
 	case "bookings":
-		_ = w.Write([]string{"id", "zone_id", "status", "stall_count", "created_at"})
-		rows, err := h.pool.Query(ctx, `
-			SELECT id::text, zone_id::text, status, stall_count, created_at
-			FROM reservations ORDER BY created_at DESC LIMIT 10000
-		`)
+		var total int
+		if err := h.pool.QueryRow(ctx, `SELECT COUNT(*) FROM reservations`).Scan(&total); err != nil {
+			return nil, nil, 0, err
+		}
+		query := `SELECT id::text, zone_id::text, status, stall_count, created_at FROM reservations ORDER BY created_at DESC`
+		args := []any{}
+		if limit > 0 {
+			query += ` LIMIT $1`
+			args = append(args, limit)
+		}
+		rows, err := h.pool.Query(ctx, query, args...)
 		if err != nil {
-			return "", err
+			return nil, nil, 0, err
 		}
 		defer rows.Close()
+		out := make([][]string, 0)
 		for rows.Next() {
 			var id, zoneID, status string
 			var stallCount int
 			var createdAt time.Time
 			if err := rows.Scan(&id, &zoneID, &status, &stallCount, &createdAt); err != nil {
-				return "", err
+				return nil, nil, 0, err
 			}
-			_ = w.Write([]string{id, zoneID, status, fmt.Sprintf("%d", stallCount), createdAt.UTC().Format(timeRFC3339)})
+			out = append(out, []string{id, zoneID, status, fmt.Sprintf("%d", stallCount), createdAt.UTC().Format(timeRFC3339)})
 		}
+		return []string{"id", "zone_id", "status", "stall_count", "created_at"}, out, total, nil
 	case "exceptions":
-		_ = w.Write([]string{"id", "exception_type", "status", "created_at"})
-		rows, err := h.pool.Query(ctx, `
-			SELECT id::text, COALESCE(exception_type,'unknown'), status, created_at
-			FROM exceptions ORDER BY created_at DESC LIMIT 10000
-		`)
+		var total int
+		if err := h.pool.QueryRow(ctx, `SELECT COUNT(*) FROM exceptions`).Scan(&total); err != nil {
+			return nil, nil, 0, err
+		}
+		query := `SELECT id::text, COALESCE(exception_type,'unknown'), status, created_at FROM exceptions ORDER BY created_at DESC`
+		args := []any{}
+		if limit > 0 {
+			query += ` LIMIT $1`
+			args = append(args, limit)
+		}
+		rows, err := h.pool.Query(ctx, query, args...)
 		if err != nil {
-			return "", err
+			return nil, nil, 0, err
 		}
 		defer rows.Close()
+		out := make([][]string, 0)
 		for rows.Next() {
 			var id, etype, status string
 			var createdAt time.Time
 			if err := rows.Scan(&id, &etype, &status, &createdAt); err != nil {
-				return "", err
+				return nil, nil, 0, err
 			}
-			_ = w.Write([]string{id, etype, status, createdAt.UTC().Format(timeRFC3339)})
+			out = append(out, []string{id, etype, status, createdAt.UTC().Format(timeRFC3339)})
 		}
+		return []string{"id", "exception_type", "status", "created_at"}, out, total, nil
 	}
-	w.Flush()
-	return buf.String(), nil
+	return nil, nil, 0, fmt.Errorf("invalid scope")
 }
 
 func (h *analyticsHandler) downloadExport(c *gin.Context) {
+	actor, ok := getCurrentUser(c)
+	if !ok {
+		abortAPIError(c, http.StatusUnauthorized, "UNAUTHORIZED", "authentication required")
+		return
+	}
+
 	var status, format, filePath string
+	var requestedBy *string
 	err := h.pool.QueryRow(c.Request.Context(), `
-		SELECT status, format, COALESCE(file_path,'') FROM exports WHERE id=$1::uuid
-	`, c.Param("id")).Scan(&status, &format, &filePath)
+		SELECT status, format, COALESCE(file_path,''), requested_by::text FROM exports WHERE id=$1::uuid
+	`, c.Param("id")).Scan(&status, &format, &filePath, &requestedBy)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			abortAPIError(c, 404, "NOT_FOUND", "export not found")
@@ -406,21 +479,24 @@ func (h *analyticsHandler) downloadExport(c *gin.Context) {
 		abortAPIError(c, 500, "INTERNAL_ERROR", "internal server error")
 		return
 	}
+	if !auth.HasAnyRole(actor.Roles, []string{auth.RoleFacilityAdmin}) {
+		if requestedBy == nil || *requestedBy != actor.ID {
+			abortAPIError(c, http.StatusForbidden, "FORBIDDEN", "forbidden")
+			return
+		}
+	}
 	if status != "ready" || filePath == "" {
 		abortAPIError(c, 404, "NOT_FOUND", "export not ready")
 		return
 	}
 
+	if format != "csv" {
+		abortAPIError(c, 400, "VALIDATION_ERROR", "format not supported")
+		return
+	}
+
 	contentType := "text/csv"
 	filename := "export.csv"
-	switch format {
-	case "excel":
-		contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-		filename = "export.xlsx"
-	case "pdf":
-		contentType = "application/pdf"
-		filename = "export.pdf"
-	}
 
 	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
 	c.Data(http.StatusOK, contentType, []byte(filePath))

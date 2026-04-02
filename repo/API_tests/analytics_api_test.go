@@ -94,6 +94,64 @@ func TestExportRoleForbidden(t *testing.T) {
 	}
 }
 
+func TestExportOwnershipRestrictedForAuditor(t *testing.T) {
+	env := setupAuthAPIEnv(t)
+	admin := loginAs(t, env, "admin", "AdminPass1234")
+	auditor := loginAs(t, env, "auditor", "UserPass1234")
+
+	createExport := apiRequest(t, env.r, http.MethodPost, "/api/exports", map[string]any{
+		"format": "csv",
+		"scope":  "bookings",
+	}, admin)
+	logStep(t, "POST", "/api/exports (admin)", createExport.Code, createExport.Body.String())
+	if createExport.Code != http.StatusCreated {
+		t.Fatalf("create export failed: %d %s", createExport.Code, createExport.Body.String())
+	}
+	exportID := extractID(t, createExport.Body.String())
+
+	listExports := apiRequest(t, env.r, http.MethodGet, "/api/exports", nil, auditor)
+	logStep(t, "GET", "/api/exports (auditor)", listExports.Code, listExports.Body.String())
+	if listExports.Code != http.StatusOK {
+		t.Fatalf("list exports failed: %d %s", listExports.Code, listExports.Body.String())
+	}
+	if strings.Contains(listExports.Body.String(), exportID) {
+		t.Fatalf("auditor should not see other users' exports")
+	}
+
+	download := apiRequest(t, env.r, http.MethodGet, "/api/exports/"+exportID+"/download", nil, auditor)
+	logStep(t, "GET", "/api/exports/:id/download (auditor)", download.Code, download.Body.String())
+	if download.Code != http.StatusForbidden {
+		t.Fatalf("expected 403 for auditor downloading another user's export, got %d", download.Code)
+	}
+}
+
+func TestExportSegmentRequiresAdmin(t *testing.T) {
+	env := setupAuthAPIEnv(t)
+	admin := loginAs(t, env, "admin", "AdminPass1234")
+	operator := loginAs(t, env, "operator", "UserPass1234")
+
+	createSeg := apiRequest(t, env.r, http.MethodPost, "/api/segments", map[string]any{
+		"name":              "Segmented Export",
+		"filter_expression": map[string]any{"arrears_balance_cents": map[string]any{"gt": 1}},
+		"schedule":          "manual",
+	}, admin)
+	logStep(t, "POST", "/api/segments", createSeg.Code, createSeg.Body.String())
+	if createSeg.Code != http.StatusCreated {
+		t.Fatalf("create segment failed: %d %s", createSeg.Code, createSeg.Body.String())
+	}
+	segmentID := extractID(t, createSeg.Body.String())
+
+	createExport := apiRequest(t, env.r, http.MethodPost, "/api/exports", map[string]any{
+		"format":     "csv",
+		"scope":      "bookings",
+		"segment_id": segmentID,
+	}, operator)
+	logStep(t, "POST", "/api/exports (segment by operator)", createExport.Code, createExport.Body.String())
+	if createExport.Code != http.StatusForbidden {
+		t.Fatalf("expected 403 for operator segment export, got %d", createExport.Code)
+	}
+}
+
 func TestExportOccupancyCSV(t *testing.T) {
 	env := setupAuthAPIEnv(t)
 	admin := loginAs(t, env, "admin", "AdminPass1234")

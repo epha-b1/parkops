@@ -173,7 +173,11 @@ func NewRouter(logger *slog.Logger, pool *pgxpool.Pool, encryptionKey []byte) *g
 	r.GET("/api/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	swaggerGroup := r.Group("/swagger")
+	swaggerGroup.Use(requireSession(authService), enforceForcePasswordChange(), requireRoles(authService, auth.RoleFacilityAdmin))
+	{
+		swaggerGroup.GET("/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
 
 	r.NoRoute(func(c *gin.Context) {
 		if isAPIPath(c.Request.URL.Path) {

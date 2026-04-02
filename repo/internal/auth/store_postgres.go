@@ -2,8 +2,11 @@ package auth
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -532,9 +535,63 @@ func (s *PostgresStore) WriteAuditLog(ctx context.Context, actorID *string, acti
 		return err
 	}
 
-	_, err = s.pool.Exec(ctx, `
-		INSERT INTO audit_logs(actor_id, action, resource_type, resource_id, detail)
-		VALUES ($1, $2, $3, $4, $5)
-	`, actorUUID, action, resourceType, resourceUUID, detailJSON)
-	return err
+	createdAt := time.Now().UTC()
+
+	tx, err := s.pool.BeginTx(ctx, pgx.TxOptions{IsoLevel: pgx.Serializable})
+	if err != nil {
+		return err
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+
+	var prevHash *string
+	if err := tx.QueryRow(ctx, `SELECT hash FROM audit_logs ORDER BY created_at DESC, id DESC LIMIT 1 FOR UPDATE`).Scan(&prevHash); err != nil {
+		if !errors.Is(err, pgx.ErrNoRows) {
+			return err
+		}
+		prevHash = nil
+	}
+
+	prevHashValue := ""
+	if prevHash != nil {
+		prevHashValue = *prevHash
+	}
+
+	hash := buildAuditHash(prevHashValue, actorUUID, action, resourceType, resourceUUID, detailJSON, createdAt)
+
+	_, err = tx.Exec(ctx, `
+		INSERT INTO audit_logs(actor_id, action, resource_type, resource_id, detail, created_at, prev_hash, hash)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+	`, actorUUID, action, resourceType, resourceUUID, detailJSON, createdAt, prevHash, hash)
+	if err != nil {
+		return err
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
+func buildAuditHash(prevHash string, actorUUID *uuid.UUID, action, resourceType string, resourceUUID *uuid.UUID, detailJSON []byte, createdAt time.Time) string {
+	actor := ""
+	if actorUUID != nil {
+		actor = actorUUID.String()
+	}
+	resource := ""
+	if resourceUUID != nil {
+		resource = resourceUUID.String()
+	}
+
+	parts := []string{
+		actor,
+		action,
+		resourceType,
+		resource,
+		string(detailJSON),
+		createdAt.UTC().Format(time.RFC3339Nano),
+		prevHash,
+	}
+
+	sum := sha256.Sum256([]byte(strings.Join(parts, "|")))
+	return hex.EncodeToString(sum[:])
 }

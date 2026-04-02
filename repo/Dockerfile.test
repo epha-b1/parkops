@@ -7,4 +7,6 @@ RUN go mod download
 
 COPY . .
 
+RUN go install github.com/swaggo/swag/cmd/swag@latest && /go/bin/swag init -g cmd/server/main.go
+
 CMD ["sh", "-c", "go test -mod=mod ./unit_tests/... ./API_tests/... -v -count=1"]

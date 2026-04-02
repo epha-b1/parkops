@@ -44,6 +44,25 @@ func TestSubmitTrackingLocationAndGetPositions(t *testing.T) {
 	}
 }
 
+func TestTrackingInvalidSignatureNotTrusted(t *testing.T) {
+	env := setupAuthAPIEnv(t)
+	admin := loginAs(t, env, "admin", "AdminPass1234")
+	fx := createReservationFixture(t, env, admin, 10, 15)
+
+	deviceTime := time.Now().UTC().Truncate(time.Second).Format(time.RFC3339)
+	create := apiRequest(t, env.r, http.MethodPost, "/api/tracking/location", map[string]any{
+		"vehicle_id":            fx.vehicleID,
+		"latitude":              37.7749,
+		"longitude":             -122.4194,
+		"device_time":           deviceTime,
+		"device_time_signature": "invalid-signature",
+	}, admin)
+	logStep(t, "POST", "/api/tracking/location", create.Code, create.Body.String())
+	if create.Code != http.StatusCreated || !strings.Contains(create.Body.String(), `"device_time_trusted":false`) {
+		t.Fatalf("expected tracking location create with untrusted timestamp, got %d %s", create.Code, create.Body.String())
+	}
+}
+
 func TestTrackingSuspectPositionHandling(t *testing.T) {
 	env := setupAuthAPIEnv(t)
 	admin := loginAs(t, env, "admin", "AdminPass1234")

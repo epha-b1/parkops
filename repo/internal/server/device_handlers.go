@@ -15,6 +15,7 @@ import (
 	"parkops/internal/auth"
 	"parkops/internal/devices"
 	"parkops/internal/exceptions"
+	"parkops/internal/tracking"
 )
 
 const reorderWindow = 10 * time.Minute
@@ -52,11 +53,28 @@ func registerDeviceRoutes(r *gin.Engine, authService *auth.Service, pool *pgxpoo
 }
 
 func (h *deviceHandler) listDevices(c *gin.Context) {
-	rows, err := h.pool.Query(c.Request.Context(), `
+	user, ok := getCurrentUser(c)
+	if !ok {
+		abortAPIError(c, http.StatusUnauthorized, "UNAUTHORIZED", "authentication required")
+		return
+	}
+
+	query := `
 		SELECT id::text, organization_id::text, device_key, device_type, zone_id::text, status, registered_at
 		FROM devices
-		ORDER BY registered_at DESC
-	`)
+	`
+	args := []any{}
+	if auth.HasAnyRole(user.Roles, []string{auth.RoleFleetManager}) {
+		if user.OrganizationID == nil {
+			abortAPIError(c, http.StatusForbidden, "FORBIDDEN", "forbidden")
+			return
+		}
+		query += ` WHERE organization_id=$1::uuid`
+		args = append(args, *user.OrganizationID)
+	}
+	query += ` ORDER BY registered_at DESC`
+
+	rows, err := h.pool.Query(c.Request.Context(), query, args...)
 	if err != nil {
 		abortAPIError(c, 500, "INTERNAL_ERROR", "internal server error")
 		return
@@ -85,6 +103,12 @@ func (h *deviceHandler) listDevices(c *gin.Context) {
 }
 
 func (h *deviceHandler) getDevice(c *gin.Context) {
+	user, ok := getCurrentUser(c)
+	if !ok {
+		abortAPIError(c, http.StatusUnauthorized, "UNAUTHORIZED", "authentication required")
+		return
+	}
+
 	var id, key, typ, status string
 	var orgID, zoneID *string
 	var registeredAt time.Time
@@ -100,6 +124,12 @@ func (h *deviceHandler) getDevice(c *gin.Context) {
 		}
 		abortAPIError(c, 500, "INTERNAL_ERROR", "internal server error")
 		return
+	}
+	if auth.HasAnyRole(user.Roles, []string{auth.RoleFleetManager}) {
+		if user.OrganizationID == nil || orgID == nil || *user.OrganizationID != *orgID {
+			abortAPIError(c, http.StatusForbidden, "FORBIDDEN", "forbidden")
+			return
+		}
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"id":              id,
@@ -261,12 +291,13 @@ func (h *deviceHandler) ingestDeviceEvent(c *gin.Context) {
 	var lastApplied int64
 	var lastSequence int64
 	var lastSeenAt *time.Time
+	var deviceKey string
 	err = tx.QueryRow(c.Request.Context(), `
-		SELECT last_applied_sequence_number, last_sequence_number, last_event_received_at
+		SELECT last_applied_sequence_number, last_sequence_number, last_event_received_at, device_key
 		FROM devices
 		WHERE id=$1
 		FOR UPDATE
-	`, b.DeviceID).Scan(&lastApplied, &lastSequence, &lastSeenAt)
+	`, b.DeviceID).Scan(&lastApplied, &lastSequence, &lastSeenAt, &deviceKey)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			abortAPIError(c, 403, "FORBIDDEN", "device is not registered")
@@ -287,7 +318,10 @@ func (h *deviceHandler) ingestDeviceEvent(c *gin.Context) {
 		abortAPIError(c, 400, "VALIDATION_ERROR", "invalid payload")
 		return
 	}
-	deviceTimeTrusted := b.DeviceTimeSignature != "" && deviceTime != nil
+	deviceTimeTrusted := false
+	if deviceTime != nil && strings.TrimSpace(b.DeviceTimeSignature) != "" {
+		deviceTimeTrusted = tracking.ValidateDeviceTimeHMAC(b.DeviceTime, b.DeviceTimeSignature, deviceKey)
+	}
 
 	processed := false
 	if !late && b.SequenceNumber == lastApplied+1 {
@@ -459,8 +493,24 @@ func (h *deviceHandler) replayDeviceEvents(c *gin.Context) {
 }
 
 func (h *deviceHandler) listDeviceEvents(c *gin.Context) {
+	user, ok := getCurrentUser(c)
+	if !ok {
+		abortAPIError(c, http.StatusUnauthorized, "UNAUTHORIZED", "authentication required")
+		return
+	}
+
 	args := make([]any, 0)
 	clauses := make([]string, 0)
+	joins := ""
+	if auth.HasAnyRole(user.Roles, []string{auth.RoleFleetManager}) {
+		if user.OrganizationID == nil {
+			abortAPIError(c, http.StatusForbidden, "FORBIDDEN", "forbidden")
+			return
+		}
+		joins = " JOIN devices d ON d.id = device_events.device_id"
+		args = append(args, *user.OrganizationID)
+		clauses = append(clauses, "d.organization_id = $"+strconv.Itoa(len(args))+"::uuid")
+	}
 	if deviceID := strings.TrimSpace(c.Query("device_id")); deviceID != "" {
 		args = append(args, deviceID)
 		clauses = append(clauses, "device_id = $"+strconv.Itoa(len(args)))
@@ -499,6 +549,9 @@ func (h *deviceHandler) listDeviceEvents(c *gin.Context) {
 		SELECT id::text, device_id::text, event_key, sequence_number, event_type, COALESCE(payload, '{}'::jsonb), received_at, device_time, device_time_trusted, late, processed
 		FROM device_events
 	`
+	if joins != "" {
+		query += joins
+	}
 	if len(clauses) > 0 {
 		query += " WHERE " + strings.Join(clauses, " AND ")
 	}

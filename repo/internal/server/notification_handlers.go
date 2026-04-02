@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -333,12 +334,16 @@ func (h *notificationHandler) downloadExportPackage(c *gin.Context) {
 	if !ok {
 		return
 	}
-	var id, channel, userID string
+	var id, channel, userID, title, body, status string
+	var payload []byte
+	var createdAt time.Time
+	var deliveredAt *time.Time
 	err := h.pool.QueryRow(c.Request.Context(), `
-		SELECT id::text, channel, user_id::text
-		FROM notification_jobs
-		WHERE id=$1::uuid AND user_id=$2::uuid
-	`, c.Param("id"), uid).Scan(&id, &channel, &userID)
+		SELECT nj.id::text, nj.channel, nj.user_id::text, nj.payload, n.title, n.body, nj.status, nj.created_at, nj.delivered_at
+		FROM notification_jobs nj
+		JOIN notifications n ON n.id = nj.notification_id
+		WHERE nj.id=$1::uuid AND nj.user_id=$2::uuid
+	`, c.Param("id"), uid).Scan(&id, &channel, &userID, &payload, &title, &body, &status, &createdAt, &deliveredAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			abortAPIError(c, 404, "NOT_FOUND", "resource not found")
@@ -348,5 +353,22 @@ func (h *notificationHandler) downloadExportPackage(c *gin.Context) {
 		return
 	}
 	_, _ = h.pool.Exec(c.Request.Context(), `UPDATE notification_jobs SET downloaded_at=now(), updated_at=now() WHERE id=$1::uuid`, id)
-	c.JSON(http.StatusOK, gin.H{"id": id, "channel": channel, "recipient": userID, "content": "export-package"})
+	content := map[string]any{}
+	if len(payload) > 0 {
+		_ = json.Unmarshal(payload, &content)
+	}
+	resp := gin.H{
+		"id":         id,
+		"channel":    channel,
+		"recipient":  userID,
+		"status":     status,
+		"title":      title,
+		"body":       body,
+		"payload":    content,
+		"created_at": createdAt.UTC().Format(timeRFC3339),
+	}
+	if deliveredAt != nil {
+		resp["delivered_at"] = deliveredAt.UTC().Format(timeRFC3339)
+	}
+	c.JSON(http.StatusOK, resp)
 }
