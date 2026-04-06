@@ -15,7 +15,7 @@ INSERT INTO users (
     'System Admin',
     'active',
     0,
-    false,
+    true,
     now(),
     now()
 )

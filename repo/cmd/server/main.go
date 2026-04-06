@@ -22,6 +22,7 @@ import (
 	"parkops/internal/campaigns"
 	"parkops/internal/config"
 	"parkops/internal/db"
+	"parkops/internal/exports"
 	"parkops/internal/notifications"
 	"parkops/internal/reconciliation"
 	"parkops/internal/segments"
@@ -53,7 +54,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	r := server.NewRouter(logger, pool, cfg.EncryptionKey)
+	if err := db.BackfillSigningSecrets(ctx, pool, cfg.EncryptionKey, logger); err != nil {
+		logger.Error("failed to backfill signing secrets", "error", err)
+		os.Exit(1)
+	}
+
+	exportStore, err := exports.NewFileStore(cfg.ExportStorageDir)
+	if err != nil {
+		logger.Error("failed to create export storage", "error", err)
+		os.Exit(1)
+	}
+
+	r := server.NewRouter(logger, pool, cfg.EncryptionKey, exportStore)
 	reconcileService := reconciliation.NewService(pool, auth.NewService(auth.NewPostgresStore(pool)))
 	go reconciliation.StartScheduler(ctx, logger, reconcileService)
 	notificationService := notifications.NewService(pool)

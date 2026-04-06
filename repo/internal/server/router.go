@@ -3,6 +3,7 @@ package server
 import (
 	"log/slog"
 	"net/http"
+	"os"
 
 	"github.com/a-h/templ"
 	"github.com/gin-gonic/gin"
@@ -12,14 +13,21 @@ import (
 
 	_ "parkops/docs"
 	"parkops/internal/auth"
+	"parkops/internal/exports"
 	"parkops/internal/segments"
 	"parkops/internal/web"
 )
 
-func NewRouter(logger *slog.Logger, pool *pgxpool.Pool, encryptionKey []byte) *gin.Engine {
+func NewRouter(logger *slog.Logger, pool *pgxpool.Pool, encryptionKey []byte, exportFileStore ...*exports.FileStore) *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.Use(recoveryJSON(), requestLogger(logger))
+
+	// Initialize session signing and secure-cookie from config env vars
+	secureCookie = os.Getenv("APP_ENV") == "production"
+	if s := os.Getenv("SESSION_SECRET"); s != "" {
+		sessionSecret = s
+	}
 
 	authStore := auth.NewPostgresStore(pool)
 	authService := auth.NewService(authStore)
@@ -32,7 +40,19 @@ func NewRouter(logger *slog.Logger, pool *pgxpool.Pool, encryptionKey []byte) *g
 	registerNotificationRoutes(r, authService, pool)
 	registerCampaignRoutes(r, authService, pool)
 	registerSegmentRoutes(r, authService, pool, segmentService)
-	registerAnalyticsRoutes(r, authService, pool)
+	segmentAuth := exports.NewSegmentAuthorizer(pool, segmentService)
+	var fs *exports.FileStore
+	if len(exportFileStore) > 0 && exportFileStore[0] != nil {
+		fs = exportFileStore[0]
+	} else {
+		// Fallback for tests: use temp dir
+		var err error
+		fs, err = exports.NewFileStore(os.TempDir() + "/parkops-exports")
+		if err != nil {
+			logger.Error("failed to create export file store", "error", err)
+		}
+	}
+	registerAnalyticsRoutes(r, authService, pool, segmentAuth, fs)
 
 	r.GET("/login", gin.WrapH(templ.Handler(web.LoginPage())))
 	pages := r.Group("")
@@ -158,6 +178,12 @@ func NewRouter(logger *slog.Logger, pool *pgxpool.Pool, encryptionKey []byte) *g
 					}, Default: "manual"},
 				},
 			}))
+		})
+		pages.GET("/tasks", func(c *gin.Context) {
+			renderPage(c, web.TasksPage(toWebUser(c)))
+		})
+		pages.GET("/notification-prefs", func(c *gin.Context) {
+			renderPage(c, web.NotificationPrefsPage(toWebUser(c)))
 		})
 		pages.GET("/analytics", func(c *gin.Context) {
 			renderPage(c, web.AnalyticsPage(toWebUser(c)))

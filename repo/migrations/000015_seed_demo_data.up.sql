@@ -3,10 +3,10 @@
 -- (same argon2id hash as admin user)
 
 -- ─── USERS ──────────────────────────────────────────────────────────────────
-INSERT INTO users (id, organization_id, username, password_hash, display_name, status) VALUES
-    ('dd000001-0000-0000-0000-000000000001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'operator1', 'argon2id$v=19$m=65536,t=3,p=2$gBb70F3kGCGkdbN2fEkdug$g5F5oED/vT9NffvnJQrmay3FbfMgR9WGqoK9yffnzTE', 'Jane Dispatch', 'active'),
-    ('dd000001-0000-0000-0000-000000000002', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'fleet1', 'argon2id$v=19$m=65536,t=3,p=2$gBb70F3kGCGkdbN2fEkdug$g5F5oED/vT9NffvnJQrmay3FbfMgR9WGqoK9yffnzTE', 'Bob Fleet', 'active'),
-    ('dd000001-0000-0000-0000-000000000003', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'auditor1', 'argon2id$v=19$m=65536,t=3,p=2$gBb70F3kGCGkdbN2fEkdug$g5F5oED/vT9NffvnJQrmay3FbfMgR9WGqoK9yffnzTE', 'Carol Auditor', 'active')
+INSERT INTO users (id, organization_id, username, password_hash, display_name, status, force_password_change) VALUES
+    ('dd000001-0000-0000-0000-000000000001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'operator1', 'argon2id$v=19$m=65536,t=3,p=2$gBb70F3kGCGkdbN2fEkdug$g5F5oED/vT9NffvnJQrmay3FbfMgR9WGqoK9yffnzTE', 'Jane Dispatch', 'active', true),
+    ('dd000001-0000-0000-0000-000000000002', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'fleet1', 'argon2id$v=19$m=65536,t=3,p=2$gBb70F3kGCGkdbN2fEkdug$g5F5oED/vT9NffvnJQrmay3FbfMgR9WGqoK9yffnzTE', 'Bob Fleet', 'active', true),
+    ('dd000001-0000-0000-0000-000000000003', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'auditor1', 'argon2id$v=19$m=65536,t=3,p=2$gBb70F3kGCGkdbN2fEkdug$g5F5oED/vT9NffvnJQrmay3FbfMgR9WGqoK9yffnzTE', 'Carol Auditor', 'active', true)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO user_roles (user_id, role_id)

@@ -34,8 +34,9 @@ func (s *Service) ProcessDueTaskReminders(ctx context.Context, now time.Time) er
 	}
 
 	tasksRows, err := tx.Query(ctx, `
-		SELECT t.id::text, t.description
+		SELECT t.id::text, t.description, COALESCE(c.target_role, '')
 		FROM tasks t
+		JOIN campaigns c ON c.id = t.campaign_id
 		WHERE t.completed_at IS NULL
 		  AND t.deadline IS NOT NULL
 		  AND t.deadline <= $1
@@ -54,31 +55,45 @@ func (s *Service) ProcessDueTaskReminders(ctx context.Context, now time.Time) er
 	type dueTask struct {
 		ID          string
 		Description string
+		TargetRole  string
 	}
 	tasks := make([]dueTask, 0)
 	for tasksRows.Next() {
 		var t dueTask
-		if err := tasksRows.Scan(&t.ID, &t.Description); err != nil {
+		if err := tasksRows.Scan(&t.ID, &t.Description, &t.TargetRole); err != nil {
 			return err
 		}
 		tasks = append(tasks, t)
 	}
 
-	usersRows, err := tx.Query(ctx, `SELECT DISTINCT user_id::text FROM notification_subscriptions WHERE topic_id=$1::uuid`, topicID)
-	if err != nil {
-		return err
-	}
-	defer usersRows.Close()
-	userIDs := make([]string, 0)
-	for usersRows.Next() {
-		var userID string
-		if err := usersRows.Scan(&userID); err != nil {
+	for _, task := range tasks {
+		// Resolve recipients: subscribers filtered by campaign target_role
+		var usersRows pgx.Rows
+		if task.TargetRole != "" {
+			usersRows, err = tx.Query(ctx, `
+				SELECT DISTINCT ns.user_id::text
+				FROM notification_subscriptions ns
+				JOIN user_roles ur ON ur.user_id = ns.user_id
+				JOIN roles r ON r.id = ur.role_id
+				WHERE ns.topic_id = $1::uuid AND r.name = $2
+			`, topicID, task.TargetRole)
+		} else {
+			usersRows, err = tx.Query(ctx, `SELECT DISTINCT user_id::text FROM notification_subscriptions WHERE topic_id=$1::uuid`, topicID)
+		}
+		if err != nil {
 			return err
 		}
-		userIDs = append(userIDs, userID)
-	}
+		userIDs := make([]string, 0)
+		for usersRows.Next() {
+			var userID string
+			if err := usersRows.Scan(&userID); err != nil {
+				usersRows.Close()
+				return err
+			}
+			userIDs = append(userIDs, userID)
+		}
+		usersRows.Close()
 
-	for _, task := range tasks {
 		for _, userID := range userIDs {
 			var startT, endT time.Time
 			var dndEnabled bool

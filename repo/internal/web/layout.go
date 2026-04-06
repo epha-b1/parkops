@@ -145,9 +145,11 @@ func buildNav(userRoles []string, currentPath string) string {
 		{Label: "Zones", Path: "/zones", Roles: []string{auth.RoleFacilityAdmin}},
 		{Label: "Rate Plans", Path: "/rate-plans", Roles: []string{auth.RoleFacilityAdmin}},
 		{Label: "Campaigns", Path: "/campaigns"},
+		{Label: "Tasks", Path: "/tasks"},
 		{Label: "Segments", Path: "/segments"},
 		{Label: "Analytics", Path: "/analytics"},
 		{Label: "Notifications", Path: "/notifications"},
+		{Label: "Notif Preferences", Path: "/notification-prefs"},
 		{Label: "Audit Log", Path: "/audit", Roles: []string{auth.RoleAuditor, auth.RoleFacilityAdmin}},
 		{Label: "Admin Users", Path: "/admin/users", Roles: []string{auth.RoleFacilityAdmin}},
 	}

@@ -22,6 +22,7 @@ type Config struct {
 	EncryptionKey   []byte
 	SessionSecret   string
 	NightlySchedule NightlySchedule
+	ExportStorageDir string
 }
 
 func Load() (Config, error) {
@@ -59,6 +60,7 @@ func Load() (Config, error) {
 		return Config{}, err
 	}
 	cfg.NightlySchedule = ns
+	cfg.ExportStorageDir = getEnv("EXPORT_STORAGE_DIR", "data/exports")
 
 	return cfg, nil
 }

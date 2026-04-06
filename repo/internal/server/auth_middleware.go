@@ -12,8 +12,19 @@ const currentUserKey = "current_user"
 
 func requireSession(authService *auth.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		sessionCookie, err := c.Cookie(auth.SessionCookieName)
-		if err != nil || sessionCookie == "" {
+		rawCookie, err := c.Cookie(auth.SessionCookieName)
+		if err != nil || rawCookie == "" {
+			if !isAPIPath(c.Request.URL.Path) {
+				c.Redirect(http.StatusSeeOther, "/login?toast=session_expired")
+				return
+			}
+			abortAPIError(c, http.StatusUnauthorized, "UNAUTHORIZED", "authentication required")
+			return
+		}
+
+		sessionCookie, valid := verifySessionID(rawCookie)
+		if !valid {
+			clearSessionCookie(c)
 			if !isAPIPath(c.Request.URL.Path) {
 				c.Redirect(http.StatusSeeOther, "/login?toast=session_expired")
 				return

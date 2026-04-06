@@ -20,10 +20,18 @@ Run the platform without Docker:
 | `NIGHTLY_SCHEDULE_HOUR` | No | `2` | Hour (0-23) for nightly segment scheduler |
 | `NIGHTLY_SCHEDULE_MINUTE` | No | `0` | Minute (0-59) for nightly segment scheduler |
 | `NIGHTLY_SCHEDULE_TIMEZONE` | No | `UTC` | IANA timezone for nightly scheduler (e.g. `America/New_York`) |
+| `EXPORT_STORAGE_DIR` | No | `data/exports` | Directory for export file storage (created automatically) |
+
+## Dependencies
+
+- `github.com/xuri/excelize/v2` — real XLSX binary export generation
+- `github.com/go-pdf/fpdf` — real PDF binary export generation
 
 ## Migration Notes
 
-Migration `000017_signing_secrets` adds `signing_secret_enc` columns to the `devices` and `vehicles` tables. These store AES-256-GCM encrypted HMAC signing secrets. Existing devices/vehicles will have `NULL` signing secrets until re-registered or updated. New devices and vehicles automatically receive generated signing secrets on creation.
+- Migration `000017_signing_secrets` adds `signing_secret_enc` columns to the `devices` and `vehicles` tables. These store AES-256-GCM encrypted HMAC signing secrets.
+- On startup, the server runs an idempotent backfill that generates encrypted signing secrets for any existing devices/vehicles with `NULL` values. No manual intervention is needed.
+- New devices and vehicles automatically receive generated signing secrets on creation.
 
 Run all tests:
 
@@ -39,13 +47,20 @@ Access the login page:
 
 `http://localhost:8080/login`
 
-## Default Admin Credentials
+## Development-Only Seed Credentials
+
+All seeded accounts require a password change on first login (`force_password_change=true`). These credentials exist only for local development and testing. Do not use in production.
 
 **Login URL**: http://localhost:8080/login
 
 **Admin Account**:
 - **Username**: `admin`
-- **Password**: `AdminPass1234`
+- **Password**: `AdminPass1234` (must change on first login)
+
+**Demo Users** (seeded by migration 000015, dev-only):
+- Dispatch Operator: `operator1` / `AdminPass1234`
+- Fleet Manager: `fleet1` / `AdminPass1234`
+- Auditor: `auditor1` / `AdminPass1234`
 
 **API Testing with curl**:
 ```bash
@@ -55,16 +70,13 @@ curl -X POST http://localhost:8080/api/auth/login \
   -d '{"username": "admin", "password": "AdminPass1234"}' \
   -c cookies.txt
 
+# Change password (required on first login)
+curl -X PATCH http://localhost:8080/api/me/password \
+  -H "Content-Type: application/json" \
+  -d '{"current_password": "AdminPass1234", "new_password": "NewSecurePass1234"}' \
+  -b cookies.txt
+
 # Test authenticated endpoint
 curl -X GET http://localhost:8080/api/me \
   -b cookies.txt
-
-# Test admin endpoint
-curl -X GET http://localhost:8080/api/admin/users \
-  -b cookies.txt
 ```
-
-**Additional Test Users** (create via API after admin login):
-- Fleet Manager: `fleet1` / `FleetPass1234`
-- Dispatch Operator: `dispatch1` / `DispatchPass1234`
-- Auditor: `auditor1` / `AuditorPass1234`

@@ -92,6 +92,83 @@ func TestCampaignTaskReminderStopsAfterComplete(t *testing.T) {
 	}
 }
 
+func TestCampaignReminderTargetRoleFiltering(t *testing.T) {
+	env := setupAuthAPIEnv(t)
+	admin := loginAs(t, env, "admin", "AdminPass1234")
+
+	// Get the task_reminder topic
+	topics := apiRequest(t, env.r, http.MethodGet, "/api/notification-topics", nil, admin)
+	if topics.Code != http.StatusOK {
+		t.Fatalf("topics failed: %d %s", topics.Code, topics.Body.String())
+	}
+	topicID := topicIDByName(t, topics.Body.String(), "task_reminder")
+
+	// Subscribe both admin (facility_admin) and operator (dispatch_operator) to task_reminder
+	adminSub := apiRequest(t, env.r, http.MethodPost, "/api/notification-topics/"+topicID+"/subscribe", nil, admin)
+	if adminSub.Code != http.StatusOK {
+		t.Fatalf("admin subscribe failed: %d %s", adminSub.Code, adminSub.Body.String())
+	}
+	operator := loginAs(t, env, "operator", "UserPass1234")
+	opSub := apiRequest(t, env.r, http.MethodPost, "/api/notification-topics/"+topicID+"/subscribe", nil, operator)
+	if opSub.Code != http.StatusOK {
+		t.Fatalf("operator subscribe failed: %d %s", opSub.Code, opSub.Body.String())
+	}
+
+	// Create campaign targeting ONLY dispatch_operator
+	createCampaign := apiRequest(t, env.r, http.MethodPost, "/api/campaigns", map[string]any{
+		"title":       "Dispatch Only Campaign",
+		"description": "should only notify dispatch",
+		"target_role": "dispatch_operator",
+	}, admin)
+	if createCampaign.Code != http.StatusCreated {
+		t.Fatalf("create campaign failed: %d %s", createCampaign.Code, createCampaign.Body.String())
+	}
+	campaignID := extractID(t, createCampaign.Body.String())
+
+	// Create a due task
+	createTask := apiRequest(t, env.r, http.MethodPost, "/api/campaigns/"+campaignID+"/tasks", map[string]any{
+		"description":               "Dispatch gate check",
+		"deadline":                  time.Now().UTC().Add(-1 * time.Hour).Format(time.RFC3339),
+		"reminder_interval_minutes": 1,
+	}, admin)
+	if createTask.Code != http.StatusCreated {
+		t.Fatalf("create task failed: %d %s", createTask.Code, createTask.Body.String())
+	}
+	taskID := extractID(t, createTask.Body.String())
+
+	// Run reminders
+	processor := campaigns.NewService(env.pool)
+	if err := processor.ProcessDueTaskReminders(context.Background(), time.Now().UTC()); err != nil {
+		t.Fatalf("process reminders: %v", err)
+	}
+
+	// Count jobs for this task grouped by user
+	var adminJobs, operatorJobs int
+	err := env.pool.QueryRow(context.Background(), `
+		SELECT COUNT(*) FROM notification_jobs
+		WHERE payload->>'task_id'=$1 AND user_id='11111111-1111-1111-1111-111111111111'::uuid
+	`, taskID).Scan(&adminJobs)
+	if err != nil {
+		t.Fatalf("count admin jobs: %v", err)
+	}
+	err = env.pool.QueryRow(context.Background(), `
+		SELECT COUNT(*) FROM notification_jobs
+		WHERE payload->>'task_id'=$1 AND user_id='22222222-2222-2222-2222-222222222222'::uuid
+	`, taskID).Scan(&operatorJobs)
+	if err != nil {
+		t.Fatalf("count operator jobs: %v", err)
+	}
+
+	// Admin (facility_admin) should NOT get the reminder — campaign targets dispatch_operator only
+	if adminJobs != 0 {
+		t.Fatalf("expected 0 reminder jobs for admin (wrong role), got %d", adminJobs)
+	}
+	// Operator (dispatch_operator) SHOULD get the reminder
+	if operatorJobs == 0 {
+		t.Fatal("expected reminder job for operator (matching target_role), got 0")
+	}
+}
+
 func TestCampaignAndTaskCRUDEndpoints(t *testing.T) {
 	env := setupAuthAPIEnv(t)
 	admin := loginAs(t, env, "admin", "AdminPass1234")

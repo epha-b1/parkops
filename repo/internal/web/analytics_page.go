@@ -43,6 +43,7 @@ func AnalyticsPage(user CurrentUser) templ.Component {
         <option value="time">By Time</option>
         <option value="region">By Region</option>
         <option value="category">By Category</option>
+        <option value="revenue">By Rate Plan</option>
       </select>
     </div>
     <div id="bookData" class="space-y-1"></div>
