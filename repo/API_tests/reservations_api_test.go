@@ -9,14 +9,17 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"parkops/internal/platform/security"
 )
 
 type reservationFixture struct {
-	facilityID string
-	lotID      string
-	zoneID     string
-	memberID   string
-	vehicleID  string
+	facilityID           string
+	lotID                string
+	zoneID               string
+	memberID             string
+	vehicleID            string
+	vehicleSigningSecret string
 }
 
 func createReservationFixture(t *testing.T, env *apiTestEnv, admin *http.Cookie, totalStalls int, holdTimeout int) reservationFixture {
@@ -62,7 +65,18 @@ func createReservationFixture(t *testing.T, env *apiTestEnv, admin *http.Cookie,
 	}
 	vehicleID := extractID(t, vehicle.Body.String())
 
-	return reservationFixture{facilityID: facilityID, lotID: lotID, zoneID: zoneID, memberID: memberID, vehicleID: vehicleID}
+	// Retrieve the vehicle's encrypted signing secret and decrypt it
+	var signingSecretEnc *string
+	err := env.pool.QueryRow(context.Background(), `SELECT signing_secret_enc FROM vehicles WHERE id=$1::uuid`, vehicleID).Scan(&signingSecretEnc)
+	vehicleSigningSecret := ""
+	if err == nil && signingSecretEnc != nil {
+		secret, decErr := security.DecryptString([]byte("0123456789abcdef0123456789abcdef"), *signingSecretEnc)
+		if decErr == nil {
+			vehicleSigningSecret = secret
+		}
+	}
+
+	return reservationFixture{facilityID: facilityID, lotID: lotID, zoneID: zoneID, memberID: memberID, vehicleID: vehicleID, vehicleSigningSecret: vehicleSigningSecret}
 }
 
 func availabilityPath(zoneID string, start, end time.Time) string {

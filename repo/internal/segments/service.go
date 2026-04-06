@@ -225,8 +225,19 @@ func (s *Service) RunNightlySegments(ctx context.Context) error {
 	return nil
 }
 
-// StartNightlyScheduler runs nightly segments at 02:00 UTC.
-func StartNightlyScheduler(ctx context.Context, logger *slog.Logger, service *Service) {
+// NightlyConfig holds the configurable schedule for nightly segment runs.
+type NightlyConfig struct {
+	Hour     int
+	Minute   int
+	Timezone *time.Location
+}
+
+// StartNightlyScheduler runs nightly segments at the configured time.
+func StartNightlyScheduler(ctx context.Context, logger *slog.Logger, service *Service, cfg NightlyConfig) {
+	if cfg.Timezone == nil {
+		cfg.Timezone = time.UTC
+	}
+	logger.Info("nightly segment scheduler configured", "hour", cfg.Hour, "minute", cfg.Minute, "timezone", cfg.Timezone.String())
 	ticker := time.NewTicker(1 * time.Minute)
 	defer ticker.Stop()
 	for {
@@ -234,8 +245,8 @@ func StartNightlyScheduler(ctx context.Context, logger *slog.Logger, service *Se
 		case <-ctx.Done():
 			return
 		case now := <-ticker.C:
-			utc := now.UTC()
-			if utc.Hour() == 2 && utc.Minute() == 0 {
+			localNow := now.In(cfg.Timezone)
+			if localNow.Hour() == cfg.Hour && localNow.Minute() == cfg.Minute {
 				if err := service.RunNightlySegments(ctx); err != nil && err != pgx.ErrNoRows {
 					logger.Error("nightly segment scheduler failed", "error", err)
 				}

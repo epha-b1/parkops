@@ -12,15 +12,17 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"parkops/internal/auth"
+	"parkops/internal/platform/security"
 	"parkops/internal/tracking"
 )
 
 type trackingHandler struct {
-	pool *pgxpool.Pool
+	pool          *pgxpool.Pool
+	encryptionKey []byte
 }
 
-func registerTrackingRoutes(r *gin.Engine, authService *auth.Service, pool *pgxpool.Pool) {
-	h := &trackingHandler{pool: pool}
+func registerTrackingRoutes(r *gin.Engine, authService *auth.Service, pool *pgxpool.Pool, encryptionKey []byte) {
+	h := &trackingHandler{pool: pool, encryptionKey: encryptionKey}
 
 	read := r.Group("/api")
 	read.Use(requireSession(authService), enforceForcePasswordChange(), requireRoles(authService, allSystemRoles()...))
@@ -85,12 +87,9 @@ func (h *trackingHandler) submitLocation(c *gin.Context) {
 	}
 	defer tx.Rollback(c.Request.Context())
 
-	var plateNumber string
 	var vehicleOrg string
-	err = tx.QueryRow(c.Request.Context(), `SELECT plate_number FROM vehicles WHERE id=$1`, b.VehicleID).Scan(&plateNumber)
-	if err == nil {
-		err = tx.QueryRow(c.Request.Context(), `SELECT organization_id::text FROM vehicles WHERE id=$1`, b.VehicleID).Scan(&vehicleOrg)
-	}
+	var signingSecretEnc *string
+	err = tx.QueryRow(c.Request.Context(), `SELECT organization_id::text, signing_secret_enc FROM vehicles WHERE id=$1`, b.VehicleID).Scan(&vehicleOrg, &signingSecretEnc)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			abortAPIError(c, http.StatusNotFound, "NOT_FOUND", "resource not found")
@@ -107,8 +106,10 @@ func (h *trackingHandler) submitLocation(c *gin.Context) {
 	}
 
 	deviceTimeTrusted := false
-	if deviceTime != nil && strings.TrimSpace(b.DeviceTimeSignature) != "" {
-		deviceTimeTrusted = tracking.ValidateDeviceTimeHMAC(b.DeviceTime, b.DeviceTimeSignature, plateNumber)
+	if deviceTime != nil && strings.TrimSpace(b.DeviceTimeSignature) != "" && signingSecretEnc != nil {
+		if secret, err := security.DecryptString(h.encryptionKey, *signingSecretEnc); err == nil {
+			deviceTimeTrusted = tracking.ValidateDeviceTimeHMAC(b.DeviceTime, b.DeviceTimeSignature, secret)
+		}
 	}
 
 	pending, hasPending, err := h.lockPendingSuspect(c, tx, b.VehicleID)

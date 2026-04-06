@@ -187,6 +187,165 @@ func TestExportExceptionsCSV(t *testing.T) {
 	}
 }
 
+// --- Export format tests ---
+
+func TestExportExcelCreateAndDownload(t *testing.T) {
+	env := setupAuthAPIEnv(t)
+	admin := loginAs(t, env, "admin", "AdminPass1234")
+
+	create := apiRequest(t, env.r, http.MethodPost, "/api/exports", map[string]any{
+		"format": "excel",
+		"scope":  "bookings",
+	}, admin)
+	logStep(t, "POST", "/api/exports (excel)", create.Code, create.Body.String())
+	if create.Code != http.StatusCreated {
+		t.Fatalf("create excel export failed: %d %s", create.Code, create.Body.String())
+	}
+	if !strings.Contains(create.Body.String(), `"format":"excel"`) {
+		t.Fatalf("expected format excel in response: %s", create.Body.String())
+	}
+	exportID := extractID(t, create.Body.String())
+
+	download := apiRequest(t, env.r, http.MethodGet, "/api/exports/"+exportID+"/download", nil, admin)
+	logStep(t, "GET", "/api/exports/:id/download (excel)", download.Code, download.Body.String())
+	if download.Code != http.StatusOK {
+		t.Fatalf("download excel export failed: %d %s", download.Code, download.Body.String())
+	}
+	ct := download.Result().Header.Get("Content-Type")
+	if !strings.Contains(ct, "spreadsheetml") {
+		t.Fatalf("expected excel content type, got %s", ct)
+	}
+	disp := download.Result().Header.Get("Content-Disposition")
+	if !strings.Contains(disp, "export.xlsx") {
+		t.Fatalf("expected export.xlsx filename, got %s", disp)
+	}
+}
+
+func TestExportPDFCreateAndDownload(t *testing.T) {
+	env := setupAuthAPIEnv(t)
+	admin := loginAs(t, env, "admin", "AdminPass1234")
+
+	create := apiRequest(t, env.r, http.MethodPost, "/api/exports", map[string]any{
+		"format": "pdf",
+		"scope":  "exceptions",
+	}, admin)
+	logStep(t, "POST", "/api/exports (pdf)", create.Code, create.Body.String())
+	if create.Code != http.StatusCreated {
+		t.Fatalf("create pdf export failed: %d %s", create.Code, create.Body.String())
+	}
+	if !strings.Contains(create.Body.String(), `"format":"pdf"`) {
+		t.Fatalf("expected format pdf in response: %s", create.Body.String())
+	}
+	exportID := extractID(t, create.Body.String())
+
+	download := apiRequest(t, env.r, http.MethodGet, "/api/exports/"+exportID+"/download", nil, admin)
+	logStep(t, "GET", "/api/exports/:id/download (pdf)", download.Code, download.Body.String())
+	if download.Code != http.StatusOK {
+		t.Fatalf("download pdf export failed: %d %s", download.Code, download.Body.String())
+	}
+	ct := download.Result().Header.Get("Content-Type")
+	if !strings.Contains(ct, "pdf") {
+		t.Fatalf("expected pdf content type, got %s", ct)
+	}
+	disp := download.Result().Header.Get("Content-Disposition")
+	if !strings.Contains(disp, "export.pdf") {
+		t.Fatalf("expected export.pdf filename, got %s", disp)
+	}
+}
+
+func TestExportInvalidFormatRejected(t *testing.T) {
+	env := setupAuthAPIEnv(t)
+	admin := loginAs(t, env, "admin", "AdminPass1234")
+
+	create := apiRequest(t, env.r, http.MethodPost, "/api/exports", map[string]any{
+		"format": "xml",
+		"scope":  "bookings",
+	}, admin)
+	logStep(t, "POST", "/api/exports (xml)", create.Code, create.Body.String())
+	if create.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400 for invalid format, got %d", create.Code)
+	}
+}
+
+func TestExportCSVBackwardCompatible(t *testing.T) {
+	env := setupAuthAPIEnv(t)
+	admin := loginAs(t, env, "admin", "AdminPass1234")
+
+	create := apiRequest(t, env.r, http.MethodPost, "/api/exports", map[string]any{
+		"format": "csv",
+		"scope":  "bookings",
+	}, admin)
+	logStep(t, "POST", "/api/exports (csv compat)", create.Code, create.Body.String())
+	if create.Code != http.StatusCreated {
+		t.Fatalf("csv compat failed: %d %s", create.Code, create.Body.String())
+	}
+
+	exportID := extractID(t, create.Body.String())
+	download := apiRequest(t, env.r, http.MethodGet, "/api/exports/"+exportID+"/download", nil, admin)
+	if download.Code != http.StatusOK {
+		t.Fatalf("csv download failed: %d %s", download.Code, download.Body.String())
+	}
+	ct := download.Result().Header.Get("Content-Type")
+	if !strings.Contains(ct, "text/csv") {
+		t.Fatalf("expected text/csv, got %s", ct)
+	}
+}
+
+// --- Export segment authorization tests ---
+
+func TestExportSegmentMembershipDeniedForOutOfScopeOperator(t *testing.T) {
+	env := setupAuthAPIEnv(t)
+	admin := loginAs(t, env, "admin", "AdminPass1234")
+
+	// Create segment as admin
+	createSeg := apiRequest(t, env.r, http.MethodPost, "/api/segments", map[string]any{
+		"name":              "Auth Test Segment",
+		"filter_expression": map[string]any{"arrears_balance_cents": map[string]any{"gt": 1}},
+		"schedule":          "manual",
+	}, admin)
+	if createSeg.Code != http.StatusCreated {
+		t.Fatalf("create segment: %d %s", createSeg.Code, createSeg.Body.String())
+	}
+	segmentID := extractID(t, createSeg.Body.String())
+
+	// Operator (dispatch) should be denied segment export since they need segment membership
+	operator := loginAs(t, env, "operator", "UserPass1234")
+	createExport := apiRequest(t, env.r, http.MethodPost, "/api/exports", map[string]any{
+		"format":     "csv",
+		"scope":      "bookings",
+		"segment_id": segmentID,
+	}, operator)
+	logStep(t, "POST", "/api/exports (segment by operator)", createExport.Code, createExport.Body.String())
+	if createExport.Code != http.StatusForbidden {
+		t.Fatalf("expected 403 for operator segment export without membership, got %d", createExport.Code)
+	}
+}
+
+func TestExportSegmentAllowedForAdmin(t *testing.T) {
+	env := setupAuthAPIEnv(t)
+	admin := loginAs(t, env, "admin", "AdminPass1234")
+
+	createSeg := apiRequest(t, env.r, http.MethodPost, "/api/segments", map[string]any{
+		"name":              "Admin Segment Test",
+		"filter_expression": map[string]any{"arrears_balance_cents": map[string]any{"gt": 1}},
+		"schedule":          "manual",
+	}, admin)
+	if createSeg.Code != http.StatusCreated {
+		t.Fatalf("create segment: %d %s", createSeg.Code, createSeg.Body.String())
+	}
+	segmentID := extractID(t, createSeg.Body.String())
+
+	createExport := apiRequest(t, env.r, http.MethodPost, "/api/exports", map[string]any{
+		"format":     "csv",
+		"scope":      "bookings",
+		"segment_id": segmentID,
+	}, admin)
+	logStep(t, "POST", "/api/exports (segment by admin)", createExport.Code, createExport.Body.String())
+	if createExport.Code != http.StatusCreated {
+		t.Fatalf("expected admin segment export to succeed, got %d %s", createExport.Code, createExport.Body.String())
+	}
+}
+
 func TestAnalyticsOccupancyMissingParams(t *testing.T) {
 	env := setupAuthAPIEnv(t)
 	admin := loginAs(t, env, "admin", "AdminPass1234")

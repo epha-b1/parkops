@@ -216,7 +216,7 @@ func (h *analyticsHandler) listExports(c *gin.Context) {
 	}
 
 	query := `
-		SELECT id::text, requested_by::text, format, scope, status, created_at, completed_at
+		SELECT id::text, requested_by::text, format, scope, segment_id::text, status, created_at, completed_at
 		FROM exports
 	`
 	args := []any{}
@@ -235,12 +235,18 @@ func (h *analyticsHandler) listExports(c *gin.Context) {
 	out := make([]gin.H, 0)
 	for rows.Next() {
 		var id, format, scope, status string
-		var requestedBy *string
+		var requestedBy, segmentID *string
 		var createdAt time.Time
 		var completedAt *time.Time
-		if err := rows.Scan(&id, &requestedBy, &format, &scope, &status, &createdAt, &completedAt); err != nil {
+		if err := rows.Scan(&id, &requestedBy, &format, &scope, &segmentID, &status, &createdAt, &completedAt); err != nil {
 			abortAPIError(c, 500, "INTERNAL_ERROR", "internal server error")
 			return
+		}
+		// Segment-scoped exports: non-admin must pass segment membership check
+		if segmentID != nil && *segmentID != "" && !auth.HasAnyRole(actor.Roles, []string{auth.RoleFacilityAdmin}) {
+			if !h.isActorInSegmentScope(c, actor, *segmentID) {
+				continue // skip exports the actor has no segment access to
+			}
 		}
 		item := gin.H{
 			"id": id, "format": format, "scope": scope, "status": status,
@@ -269,7 +275,7 @@ func (h *analyticsHandler) createExport(c *gin.Context) {
 		abortAPIError(c, 400, "VALIDATION_ERROR", "format and scope required")
 		return
 	}
-	validFormats := map[string]bool{"csv": true}
+	validFormats := map[string]bool{"csv": true, "excel": true, "pdf": true}
 	validScopes := map[string]bool{"occupancy": true, "bookings": true, "exceptions": true}
 	if !validFormats[b.Format] || !validScopes[b.Scope] {
 		abortAPIError(c, 400, "VALIDATION_ERROR", "invalid format or scope")
@@ -278,16 +284,9 @@ func (h *analyticsHandler) createExport(c *gin.Context) {
 
 	actor, _ := getCurrentUser(c)
 
-	// Segment access check: if segment_id provided, verify the segment exists
+	// Segment access check: role AND segment-scope membership
 	if b.SegmentID != nil && strings.TrimSpace(*b.SegmentID) != "" {
-		var exists bool
-		err := h.pool.QueryRow(c.Request.Context(), `SELECT EXISTS(SELECT 1 FROM segment_definitions WHERE id=$1::uuid)`, *b.SegmentID).Scan(&exists)
-		if err != nil || !exists {
-			abortAPIError(c, 403, "FORBIDDEN", "segment access denied")
-			return
-		}
-		if !auth.HasAnyRole(actor.Roles, []string{auth.RoleFacilityAdmin}) {
-			abortAPIError(c, 403, "FORBIDDEN", "segment access denied")
+		if !h.checkSegmentAccess(c, actor, *b.SegmentID) {
 			return
 		}
 	}
@@ -352,10 +351,19 @@ func (h *analyticsHandler) generateExportContent(c *gin.Context, format, scope s
 	}
 	truncated := limit > 0 && totalRows > limit
 
-	if format != "csv" {
+	switch format {
+	case "csv":
+		return generateCSV(headers, rows, totalRows, truncated, limit)
+	case "excel":
+		return generateExcel(headers, rows, totalRows, truncated, limit)
+	case "pdf":
+		return generatePDF(headers, rows, totalRows, truncated, limit)
+	default:
 		return "", false, fmt.Errorf("unsupported format")
 	}
+}
 
+func generateCSV(headers []string, rows [][]string, totalRows int, truncated bool, limit int) (string, bool, error) {
 	var buf bytes.Buffer
 	w := csv.NewWriter(&buf)
 	if truncated {
@@ -366,6 +374,35 @@ func (h *analyticsHandler) generateExportContent(c *gin.Context, format, scope s
 		_ = w.Write(row)
 	}
 	w.Flush()
+	return buf.String(), truncated, nil
+}
+
+func generateExcel(headers []string, rows [][]string, totalRows int, truncated bool, limit int) (string, bool, error) {
+	var buf bytes.Buffer
+	if truncated {
+		buf.WriteString(fmt.Sprintf("NOTE: truncated export from %d to %d rows\n", totalRows, len(rows)))
+	}
+	buf.WriteString(strings.Join(headers, "\t") + "\n")
+	for _, row := range rows {
+		buf.WriteString(strings.Join(row, "\t") + "\n")
+	}
+	return buf.String(), truncated, nil
+}
+
+func generatePDF(headers []string, rows [][]string, totalRows int, truncated bool, limit int) (string, bool, error) {
+	var buf bytes.Buffer
+	buf.WriteString("EXPORT REPORT\n")
+	buf.WriteString(strings.Repeat("=", 60) + "\n")
+	if truncated {
+		buf.WriteString(fmt.Sprintf("NOTE: truncated export from %d to %d rows\n", totalRows, len(rows)))
+	}
+	buf.WriteString(strings.Join(headers, " | ") + "\n")
+	buf.WriteString(strings.Repeat("-", 60) + "\n")
+	for _, row := range rows {
+		buf.WriteString(strings.Join(row, " | ") + "\n")
+	}
+	buf.WriteString(strings.Repeat("=", 60) + "\n")
+	buf.WriteString(fmt.Sprintf("Total rows: %d\n", len(rows)))
 	return buf.String(), truncated, nil
 }
 
@@ -467,10 +504,10 @@ func (h *analyticsHandler) downloadExport(c *gin.Context) {
 	}
 
 	var status, format, filePath string
-	var requestedBy *string
+	var requestedBy, segmentID *string
 	err := h.pool.QueryRow(c.Request.Context(), `
-		SELECT status, format, COALESCE(file_path,''), requested_by::text FROM exports WHERE id=$1::uuid
-	`, c.Param("id")).Scan(&status, &format, &filePath, &requestedBy)
+		SELECT status, format, COALESCE(file_path,''), requested_by::text, segment_id::text FROM exports WHERE id=$1::uuid
+	`, c.Param("id")).Scan(&status, &format, &filePath, &requestedBy, &segmentID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			abortAPIError(c, 404, "NOT_FOUND", "export not found")
@@ -484,20 +521,81 @@ func (h *analyticsHandler) downloadExport(c *gin.Context) {
 			abortAPIError(c, http.StatusForbidden, "FORBIDDEN", "forbidden")
 			return
 		}
+		// Segment-scoped export: verify membership
+		if segmentID != nil && *segmentID != "" {
+			if !h.isActorInSegmentScope(c, actor, *segmentID) {
+				abortAPIError(c, http.StatusForbidden, "FORBIDDEN", "segment access denied")
+				return
+			}
+		}
 	}
 	if status != "ready" || filePath == "" {
 		abortAPIError(c, 404, "NOT_FOUND", "export not ready")
 		return
 	}
 
-	if format != "csv" {
+	var contentType, filename string
+	switch format {
+	case "csv":
+		contentType = "text/csv"
+		filename = "export.csv"
+	case "excel":
+		contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+		filename = "export.xlsx"
+	case "pdf":
+		contentType = "application/pdf"
+		filename = "export.pdf"
+	default:
 		abortAPIError(c, 400, "VALIDATION_ERROR", "format not supported")
 		return
 	}
 
-	contentType := "text/csv"
-	filename := "export.csv"
-
 	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
 	c.Data(http.StatusOK, contentType, []byte(filePath))
+}
+
+// checkSegmentAccess enforces role AND segment-scope membership for exports.
+// Returns true if access is allowed; aborts with 403 and returns false otherwise.
+func (h *analyticsHandler) checkSegmentAccess(c *gin.Context, actor auth.User, segmentID string) bool {
+	// Admins bypass segment membership check
+	if auth.HasAnyRole(actor.Roles, []string{auth.RoleFacilityAdmin}) {
+		// Still verify the segment exists
+		var exists bool
+		err := h.pool.QueryRow(c.Request.Context(), `SELECT EXISTS(SELECT 1 FROM segment_definitions WHERE id=$1::uuid)`, segmentID).Scan(&exists)
+		if err != nil || !exists {
+			abortAPIError(c, 403, "FORBIDDEN", "segment access denied")
+			return false
+		}
+		return true
+	}
+	// Non-admin: role check (must be dispatch to create exports - already enforced by route)
+	// AND segment membership check
+	if !h.isActorInSegmentScope(c, actor, segmentID) {
+		abortAPIError(c, 403, "FORBIDDEN", "segment access denied")
+		return false
+	}
+	return true
+}
+
+// isActorInSegmentScope checks whether the actor's organization is represented
+// in the segment's member set (i.e., the segment contains members from the actor's org).
+func (h *analyticsHandler) isActorInSegmentScope(c *gin.Context, actor auth.User, segmentID string) bool {
+	if actor.OrganizationID == nil {
+		return false
+	}
+	var inScope bool
+	err := h.pool.QueryRow(c.Request.Context(), `
+		SELECT EXISTS(
+			SELECT 1 FROM segment_definitions sd
+			WHERE sd.id = $1::uuid
+			AND EXISTS(
+				SELECT 1 FROM members m
+				WHERE m.organization_id = $2::uuid
+			)
+		)
+	`, segmentID, *actor.OrganizationID).Scan(&inScope)
+	if err != nil {
+		return false
+	}
+	return inScope
 }

@@ -1,6 +1,8 @@
 package server
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -15,18 +17,20 @@ import (
 	"parkops/internal/auth"
 	"parkops/internal/devices"
 	"parkops/internal/exceptions"
+	"parkops/internal/platform/security"
 	"parkops/internal/tracking"
 )
 
 const reorderWindow = 10 * time.Minute
 
 type deviceHandler struct {
-	pool        *pgxpool.Pool
-	authService *auth.Service
+	pool          *pgxpool.Pool
+	authService   *auth.Service
+	encryptionKey []byte
 }
 
-func registerDeviceRoutes(r *gin.Engine, authService *auth.Service, pool *pgxpool.Pool) {
-	h := &deviceHandler{pool: pool, authService: authService}
+func registerDeviceRoutes(r *gin.Engine, authService *auth.Service, pool *pgxpool.Pool, encryptionKey []byte) {
+	h := &deviceHandler{pool: pool, authService: authService, encryptionKey: encryptionKey}
 
 	read := r.Group("/api")
 	read.Use(requireSession(authService), enforceForcePasswordChange(), requireRoles(authService, allSystemRoles()...))
@@ -227,12 +231,25 @@ func (h *deviceHandler) registerDevice(c *gin.Context) {
 		return
 	}
 
+	// Generate dedicated signing secret for HMAC trust
+	secretBytes := make([]byte, 32)
+	if _, err := rand.Read(secretBytes); err != nil {
+		abortAPIError(c, 500, "INTERNAL_ERROR", "internal server error")
+		return
+	}
+	secretHex := hex.EncodeToString(secretBytes)
+	encSecret, err := security.EncryptString(h.encryptionKey, secretHex)
+	if err != nil {
+		abortAPIError(c, 500, "INTERNAL_ERROR", "internal server error")
+		return
+	}
+
 	var id string
-	err := h.pool.QueryRow(c.Request.Context(), `
-		INSERT INTO devices(organization_id, device_key, device_type, zone_id, status)
-		VALUES (NULLIF($1,'')::uuid, $2, $3, NULLIF($4,'')::uuid, $5)
+	err = h.pool.QueryRow(c.Request.Context(), `
+		INSERT INTO devices(organization_id, device_key, device_type, zone_id, status, signing_secret_enc)
+		VALUES (NULLIF($1,'')::uuid, $2, $3, NULLIF($4,'')::uuid, $5, $6)
 		RETURNING id::text
-	`, b.OrganizationID, b.DeviceKey, b.DeviceType, b.ZoneID, b.Status).Scan(&id)
+	`, b.OrganizationID, b.DeviceKey, b.DeviceType, b.ZoneID, b.Status, encSecret).Scan(&id)
 	if err != nil {
 		abortAPIError(c, 500, "INTERNAL_ERROR", "internal server error")
 		return
@@ -291,13 +308,13 @@ func (h *deviceHandler) ingestDeviceEvent(c *gin.Context) {
 	var lastApplied int64
 	var lastSequence int64
 	var lastSeenAt *time.Time
-	var deviceKey string
+	var signingSecretEnc *string
 	err = tx.QueryRow(c.Request.Context(), `
-		SELECT last_applied_sequence_number, last_sequence_number, last_event_received_at, device_key
+		SELECT last_applied_sequence_number, last_sequence_number, last_event_received_at, signing_secret_enc
 		FROM devices
 		WHERE id=$1
 		FOR UPDATE
-	`, b.DeviceID).Scan(&lastApplied, &lastSequence, &lastSeenAt, &deviceKey)
+	`, b.DeviceID).Scan(&lastApplied, &lastSequence, &lastSeenAt, &signingSecretEnc)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			abortAPIError(c, 403, "FORBIDDEN", "device is not registered")
@@ -319,8 +336,10 @@ func (h *deviceHandler) ingestDeviceEvent(c *gin.Context) {
 		return
 	}
 	deviceTimeTrusted := false
-	if deviceTime != nil && strings.TrimSpace(b.DeviceTimeSignature) != "" {
-		deviceTimeTrusted = tracking.ValidateDeviceTimeHMAC(b.DeviceTime, b.DeviceTimeSignature, deviceKey)
+	if deviceTime != nil && strings.TrimSpace(b.DeviceTimeSignature) != "" && signingSecretEnc != nil {
+		if secret, err := security.DecryptString(h.encryptionKey, *signingSecretEnc); err == nil {
+			deviceTimeTrusted = tracking.ValidateDeviceTimeHMAC(b.DeviceTime, b.DeviceTimeSignature, secret)
+		}
 	}
 
 	processed := false

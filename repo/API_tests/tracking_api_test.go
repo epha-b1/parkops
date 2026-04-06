@@ -22,8 +22,11 @@ func TestSubmitTrackingLocationAndGetPositions(t *testing.T) {
 	admin := loginAs(t, env, "admin", "AdminPass1234")
 	fx := createReservationFixture(t, env, admin, 10, 15)
 
+	if fx.vehicleSigningSecret == "" {
+		t.Fatal("vehicle signing secret not available in fixture")
+	}
 	deviceTime := time.Now().UTC().Truncate(time.Second).Format(time.RFC3339)
-	sig := signDeviceTime(deviceTime, "RES-123")
+	sig := signDeviceTime(deviceTime, fx.vehicleSigningSecret)
 
 	create := apiRequest(t, env.r, http.MethodPost, "/api/tracking/location", map[string]any{
 		"vehicle_id":            fx.vehicleID,
@@ -60,6 +63,70 @@ func TestTrackingInvalidSignatureNotTrusted(t *testing.T) {
 	logStep(t, "POST", "/api/tracking/location", create.Code, create.Body.String())
 	if create.Code != http.StatusCreated || !strings.Contains(create.Body.String(), `"device_time_trusted":false`) {
 		t.Fatalf("expected tracking location create with untrusted timestamp, got %d %s", create.Code, create.Body.String())
+	}
+}
+
+func TestTrackingPlateNumberAsSecretNotTrusted(t *testing.T) {
+	env := setupAuthAPIEnv(t)
+	admin := loginAs(t, env, "admin", "AdminPass1234")
+	fx := createReservationFixture(t, env, admin, 10, 15)
+
+	// Sign using plate number (old, insecure approach) -- should NOT be trusted
+	deviceTime := time.Now().UTC().Truncate(time.Second).Format(time.RFC3339)
+	sig := signDeviceTime(deviceTime, "RES-123") // plate number, not dedicated secret
+
+	create := apiRequest(t, env.r, http.MethodPost, "/api/tracking/location", map[string]any{
+		"vehicle_id":            fx.vehicleID,
+		"latitude":              37.7749,
+		"longitude":             -122.4194,
+		"device_time":           deviceTime,
+		"device_time_signature": sig,
+	}, admin)
+	logStep(t, "POST", "/api/tracking/location (plate secret)", create.Code, create.Body.String())
+	if create.Code != http.StatusCreated {
+		t.Fatalf("expected 201, got %d %s", create.Code, create.Body.String())
+	}
+	if strings.Contains(create.Body.String(), `"device_time_trusted":true`) {
+		t.Fatalf("plate number as secret should NOT produce trusted timestamp")
+	}
+}
+
+func TestTrackingDedicatedSecretProducesTrusted(t *testing.T) {
+	env := setupAuthAPIEnv(t)
+	admin := loginAs(t, env, "admin", "AdminPass1234")
+	fx := createReservationFixture(t, env, admin, 10, 15)
+
+	if fx.vehicleSigningSecret == "" {
+		t.Fatal("vehicle signing secret not available")
+	}
+	deviceTime := time.Now().UTC().Truncate(time.Second).Format(time.RFC3339)
+	sig := signDeviceTime(deviceTime, fx.vehicleSigningSecret)
+
+	create := apiRequest(t, env.r, http.MethodPost, "/api/tracking/location", map[string]any{
+		"vehicle_id":            fx.vehicleID,
+		"latitude":              37.7749,
+		"longitude":             -122.4194,
+		"device_time":           deviceTime,
+		"device_time_signature": sig,
+	}, admin)
+	logStep(t, "POST", "/api/tracking/location (dedicated secret)", create.Code, create.Body.String())
+	if create.Code != http.StatusCreated || !strings.Contains(create.Body.String(), `"device_time_trusted":true`) {
+		t.Fatalf("dedicated secret should produce trusted timestamp, got %d %s", create.Code, create.Body.String())
+	}
+}
+
+func TestTrackingSigningSecretNotExposedInVehicleAPI(t *testing.T) {
+	env := setupAuthAPIEnv(t)
+	admin := loginAs(t, env, "admin", "AdminPass1234")
+	fx := createReservationFixture(t, env, admin, 10, 15)
+
+	resp := apiRequest(t, env.r, http.MethodGet, "/api/vehicles/"+fx.vehicleID, nil, admin)
+	logStep(t, "GET", "/api/vehicles/:id", resp.Code, resp.Body.String())
+	if resp.Code != http.StatusOK {
+		t.Fatalf("get vehicle failed: %d %s", resp.Code, resp.Body.String())
+	}
+	if strings.Contains(resp.Body.String(), "signing_secret") {
+		t.Fatalf("signing secret should NOT be exposed in vehicle API response")
 	}
 }
 

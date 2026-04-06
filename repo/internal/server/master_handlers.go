@@ -1,7 +1,9 @@
 package server
 
 import (
+	"crypto/rand"
 	"database/sql"
+	"encoding/hex"
 	"errors"
 	"net/http"
 	"strconv"
@@ -15,6 +17,11 @@ import (
 
 	"parkops/internal/auth"
 	"parkops/internal/platform/security"
+)
+
+var (
+	cryptoRandRead     = rand.Read
+	hexEncodeToString  = hex.EncodeToString
 )
 
 type masterHandler struct {
@@ -533,7 +540,19 @@ func (h *masterHandler) createVehicle(c *gin.Context) {
 		abortAPIError(c, 400, "VALIDATION_ERROR", "invalid request body")
 		return
 	}
-	h.insertSimple(c, "vehicles", []string{"organization_id", "plate_number", "make", "model"}, []any{h.actorOrgOrDefault(c), b.PlateNumber, b.Make, b.Model})
+	// Generate dedicated signing secret for HMAC trust
+	secretBytes := make([]byte, 32)
+	if _, err := cryptoRandRead(secretBytes); err != nil {
+		abortAPIError(c, 500, "INTERNAL_ERROR", "internal server error")
+		return
+	}
+	secretHex := hexEncodeToString(secretBytes)
+	encSecret, err := security.EncryptString(h.encryptionKey, secretHex)
+	if err != nil {
+		abortAPIError(c, 500, "INTERNAL_ERROR", "internal server error")
+		return
+	}
+	h.insertSimple(c, "vehicles", []string{"organization_id", "plate_number", "make", "model", "signing_secret_enc"}, []any{h.actorOrgOrDefault(c), b.PlateNumber, b.Make, b.Model, encSecret})
 }
 func (h *masterHandler) updateVehicle(c *gin.Context) {
 	if !h.assertOrgScopeByID(c, "vehicles", c.Param("id")) {

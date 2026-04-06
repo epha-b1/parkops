@@ -61,7 +61,12 @@ func main() {
 	campaignService := campaigns.NewService(pool)
 	go campaigns.StartReminderScheduler(ctx, logger, campaignService)
 	segmentService := segments.NewService(pool)
-	go segments.StartNightlyScheduler(ctx, logger, segmentService)
+	nightlyCfg := segments.NightlyConfig{
+		Hour:     cfg.NightlySchedule.Hour,
+		Minute:   cfg.NightlySchedule.Minute,
+		Timezone: cfg.NightlySchedule.Timezone,
+	}
+	go segments.StartNightlyScheduler(ctx, logger, segmentService, nightlyCfg)
 
 	httpServer := &http.Server{
 		Addr:              cfg.AppAddr,

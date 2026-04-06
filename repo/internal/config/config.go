@@ -5,14 +5,23 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
+	"time"
 )
 
+type NightlySchedule struct {
+	Hour     int
+	Minute   int
+	Timezone *time.Location
+}
+
 type Config struct {
-	AppAddr       string
-	AppEnv        string
-	DatabaseURL   string
-	EncryptionKey []byte
-	SessionSecret string
+	AppAddr         string
+	AppEnv          string
+	DatabaseURL     string
+	EncryptionKey   []byte
+	SessionSecret   string
+	NightlySchedule NightlySchedule
 }
 
 func Load() (Config, error) {
@@ -44,7 +53,37 @@ func Load() (Config, error) {
 	}
 	cfg.EncryptionKey = key
 
+	// Nightly schedule config with safe defaults
+	ns, err := loadNightlySchedule()
+	if err != nil {
+		return Config{}, err
+	}
+	cfg.NightlySchedule = ns
+
 	return cfg, nil
+}
+
+func loadNightlySchedule() (NightlySchedule, error) {
+	hourStr := getEnv("NIGHTLY_SCHEDULE_HOUR", "2")
+	minuteStr := getEnv("NIGHTLY_SCHEDULE_MINUTE", "0")
+	tzStr := getEnv("NIGHTLY_SCHEDULE_TIMEZONE", "UTC")
+
+	hour, err := strconv.Atoi(hourStr)
+	if err != nil || hour < 0 || hour > 23 {
+		return NightlySchedule{}, fmt.Errorf("NIGHTLY_SCHEDULE_HOUR must be 0-23, got %q", hourStr)
+	}
+
+	minute, err := strconv.Atoi(minuteStr)
+	if err != nil || minute < 0 || minute > 59 {
+		return NightlySchedule{}, fmt.Errorf("NIGHTLY_SCHEDULE_MINUTE must be 0-59, got %q", minuteStr)
+	}
+
+	loc, err := time.LoadLocation(tzStr)
+	if err != nil {
+		return NightlySchedule{}, fmt.Errorf("NIGHTLY_SCHEDULE_TIMEZONE invalid: %w", err)
+	}
+
+	return NightlySchedule{Hour: hour, Minute: minute, Timezone: loc}, nil
 }
 
 func getEnv(key, fallback string) string {
