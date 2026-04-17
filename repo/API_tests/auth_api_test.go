@@ -33,20 +33,25 @@ func setupAuthAPIEnv(t *testing.T) *apiTestEnv {
 	if dbURL == "" {
 		dbURL = "postgres://parkops:parkops@127.0.0.1:5432/parkops?sslmode=disable"
 	}
+	// Silent-skip is only allowed when the caller has NOT set TEST_DATABASE_URL
+	// AND has opted in via ALLOW_DB_SKIP=1. In any other configuration the
+	// suite must fail hard on an unreachable DB so reviewers get a true pass/fail
+	// signal rather than an "all skipped" green build.
+	_, allowSkip := os.LookupEnv("ALLOW_DB_SKIP")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	pool, err := pgxpool.New(ctx, dbURL)
 	if err != nil {
-		if hasExplicitDBURL {
+		if hasExplicitDBURL || !allowSkip {
 			t.Fatalf("db unavailable: %v", err)
 		}
 		t.Skipf("skipping auth api tests, db unavailable: %v", err)
 	}
 	if err := pool.Ping(ctx); err != nil {
 		pool.Close()
-		if hasExplicitDBURL {
+		if hasExplicitDBURL || !allowSkip {
 			t.Fatalf("db unreachable: %v", err)
 		}
 		t.Skipf("skipping auth api tests, db unreachable: %v", err)

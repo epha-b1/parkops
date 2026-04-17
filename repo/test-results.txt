@@ -1,2 +1,1782 @@
-ok  	parkops/unit_tests	6.002s
-ok  	parkops/API_tests	192.722s
+=== RUN   TestLockoutAfterFiveFailures
+--- PASS: TestLockoutAfterFiveFailures (1.67s)
+=== RUN   TestSessionTimeout
+--- PASS: TestSessionTimeout (0.74s)
+=== RUN   TestForcePasswordChangeBlocksRoutes
+--- PASS: TestForcePasswordChangeBlocksRoutes (0.00s)
+=== RUN   TestBackfillSigningSecretsIdempotent
+--- PASS: TestBackfillSigningSecretsIdempotent (0.02s)
+=== RUN   TestHoldAtomicityConcurrentLastStall
+--- PASS: TestHoldAtomicityConcurrentLastStall (0.00s)
+=== RUN   TestHoldExpiryRestoresCapacity
+--- PASS: TestHoldExpiryRestoresCapacity (0.00s)
+=== RUN   TestConfirmRecheckFailsAfterExpiry
+--- PASS: TestConfirmRecheckFailsAfterExpiry (0.00s)
+=== RUN   TestCancelReleasesStalls
+--- PASS: TestCancelReleasesStalls (0.00s)
+=== RUN   TestNightlyScheduleDefaults
+--- PASS: TestNightlyScheduleDefaults (0.00s)
+=== RUN   TestNightlyScheduleCustomValues
+--- PASS: TestNightlyScheduleCustomValues (0.00s)
+=== RUN   TestNightlyScheduleInvalidHour
+--- PASS: TestNightlyScheduleInvalidHour (0.00s)
+=== RUN   TestNightlyScheduleInvalidMinute
+--- PASS: TestNightlyScheduleInvalidMinute (0.00s)
+=== RUN   TestNightlyScheduleInvalidTimezone
+--- PASS: TestNightlyScheduleInvalidTimezone (0.00s)
+=== RUN   TestDeviceDeduplicationRule
+--- PASS: TestDeviceDeduplicationRule (0.00s)
+=== RUN   TestOutOfOrderWithinWindow
+--- PASS: TestOutOfOrderWithinWindow (0.00s)
+=== RUN   TestLateFlagOutsideWindow
+--- PASS: TestLateFlagOutsideWindow (0.00s)
+=== RUN   TestReplayDecision
+--- PASS: TestReplayDecision (0.00s)
+=== RUN   TestExceptionCreatedFromDeviceEvent
+--- PASS: TestExceptionCreatedFromDeviceEvent (0.00s)
+=== RUN   TestAcknowledgeTransitionsStatus
+--- PASS: TestAcknowledgeTransitionsStatus (0.00s)
+=== RUN   TestDNDDefer
+--- PASS: TestDNDDefer (0.00s)
+=== RUN   TestFrequencyCap
+--- PASS: TestFrequencyCap (0.00s)
+=== RUN   TestRetryBackoff
+--- PASS: TestRetryBackoff (0.00s)
+=== RUN   TestRoleCheckLogic
+--- PASS: TestRoleCheckLogic (0.00s)
+=== RUN   TestReconciliationPositiveDeltaGeneratesCompensatingHold
+--- PASS: TestReconciliationPositiveDeltaGeneratesCompensatingHold (0.00s)
+=== RUN   TestReconciliationNegativeDeltaGeneratesCompensatingRelease
+--- PASS: TestReconciliationNegativeDeltaGeneratesCompensatingRelease (0.00s)
+=== RUN   TestReconciliationZeroDeltaGeneratesNothing
+--- PASS: TestReconciliationZeroDeltaGeneratesNothing (0.00s)
+=== RUN   TestPasswordPolicy
+=== PAUSE TestPasswordPolicy
+=== RUN   TestHashPasswordAndVerify
+=== PAUSE TestHashPasswordAndVerify
+=== RUN   TestEncryptionRoundTrip
+=== PAUSE TestEncryptionRoundTrip
+=== RUN   TestSigningSecretEncryptionRoundTrip
+--- PASS: TestSigningSecretEncryptionRoundTrip (0.00s)
+=== RUN   TestDedicatedSecretHMACValidation
+--- PASS: TestDedicatedSecretHMACValidation (0.00s)
+=== RUN   TestDriftThresholdSuspectOver500MetersIn30Seconds
+--- PASS: TestDriftThresholdSuspectOver500MetersIn30Seconds (0.00s)
+=== RUN   TestStopDetectionAtExactly3Minutes
+--- PASS: TestStopDetectionAtExactly3Minutes (0.00s)
+=== RUN   TestTrustedTimestampHMACValidation
+--- PASS: TestTrustedTimestampHMACValidation (0.00s)
+=== RUN   TestSuspectDiscardedWithoutConfirmation
+--- PASS: TestSuspectDiscardedWithoutConfirmation (0.00s)
+=== CONT  TestPasswordPolicy
+--- PASS: TestPasswordPolicy (0.00s)
+=== CONT  TestEncryptionRoundTrip
+--- PASS: TestEncryptionRoundTrip (0.00s)
+=== CONT  TestHashPasswordAndVerify
+--- PASS: TestHashPasswordAndVerify (0.96s)
+PASS
+ok  	parkops/unit_tests	3.436s
+=== RUN   TestAnalyticsOccupancyEndpoint
+    analytics_api_test.go:14:   → POST /api/auth/login
+    analytics_api_test.go:14:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:29:59Z"}
+    analytics_api_test.go:18:   → POST /api/facilities
+    analytics_api_test.go:18:   ← 201 {"id":"4b311001-1f62-4524-b09d-c6c71700aa02"}
+    analytics_api_test.go:18:   → POST /api/lots
+    analytics_api_test.go:18:   ← 201 {"id":"1dbc405b-bca4-4e6e-bc91-b5b1e7ba3d94"}
+    analytics_api_test.go:18:   → POST /api/zones
+    analytics_api_test.go:18:   ← 201 {"id":"8e3018cb-8a7b-475a-90d0-f1af370a80af"}
+    analytics_api_test.go:18:   → POST /api/members
+    analytics_api_test.go:18:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:30:00Z","display_name":"Member Res","id":"ca245625-ec62-4435-b73d-1ca002997d05","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    analytics_api_test.go:18:   → POST /api/vehicles
+    analytics_api_test.go:18:   ← 201 {"id":"5434c978-4af6-48c4-a7dd-59616e20cb7c"}
+    analytics_api_test.go:31:   → GET /api/analytics/occupancy
+    analytics_api_test.go:31:   ← 200 [{"avg_occupancy_pct":30,"peak_occupancy_pct":30,"period":"2026-04-17T00:00:00Z"}]
+--- PASS: TestAnalyticsOccupancyEndpoint (3.02s)
+=== RUN   TestAnalyticsBookingsEndpoint
+    analytics_api_test.go:53:   → POST /api/auth/login
+    analytics_api_test.go:53:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:02Z"}
+    analytics_api_test.go:57:   → POST /api/facilities
+    analytics_api_test.go:57:   ← 201 {"id":"54b3d60a-c115-47e5-a2fb-1ebff325ff6f"}
+    analytics_api_test.go:57:   → POST /api/lots
+    analytics_api_test.go:57:   ← 201 {"id":"971fd213-1d1b-4190-b8e3-8a7a043e9dbe"}
+    analytics_api_test.go:57:   → POST /api/zones
+    analytics_api_test.go:57:   ← 201 {"id":"a816e4f0-bf63-4eda-a722-9cd4813b65b2"}
+    analytics_api_test.go:57:   → POST /api/members
+    analytics_api_test.go:57:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:30:02Z","display_name":"Member Res","id":"f2397e22-ae3e-4332-8c1e-ac3dcd5c80b1","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    analytics_api_test.go:57:   → POST /api/vehicles
+    analytics_api_test.go:57:   ← 201 {"id":"8df718b1-e373-48fc-a858-957b75c734e6"}
+    analytics_api_test.go:73:   → GET /api/analytics/bookings
+    analytics_api_test.go:73:   ← 200 [{"count":1,"label":"2026-04-17 00:00:00+00","total_stalls":1}]
+--- PASS: TestAnalyticsBookingsEndpoint (2.00s)
+=== RUN   TestAnalyticsExceptionsEndpoint
+    analytics_api_test.go:99:   → POST /api/auth/login
+    analytics_api_test.go:99:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:04Z"}
+    analytics_api_test.go:120:   → GET /api/analytics/exceptions
+    analytics_api_test.go:120:   ← 200 [{"count":1,"exception_type":"sensor_offline"}]
+--- PASS: TestAnalyticsExceptionsEndpoint (1.98s)
+=== RUN   TestExportCRUDAndDownload
+    analytics_api_test.go:145:   → POST /api/auth/login
+    analytics_api_test.go:145:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:06Z"}
+    analytics_api_test.go:152:   → POST /api/exports
+    analytics_api_test.go:152:   ← 201 {"created_at":"2026-04-17T16:30:06Z","format":"csv","id":"f95ce018-4ced-4409-8638-2cf792102479","scope":"bookings","status":"ready","truncated":false}
+    analytics_api_test.go:163:   → GET /api/exports
+    analytics_api_test.go:163:   ← 200 [{"completed_at":"2026-04-17T16:30:06Z","created_at":"2026-04-17T16:30:06Z","format":"csv","id":"f95ce018-4ced-4409-8638-2cf792102479","requested_by":"11111111-1111-1111-1111-111111111111","scope":"bookings","status":"ready"}]
+    analytics_api_test.go:170:   → GET /api/exports/:id/download
+    analytics_api_test.go:170:   ← 200 id,zone_id,status,stall_count,created_at
+--- PASS: TestExportCRUDAndDownload (2.03s)
+=== RUN   TestExportRoleForbidden
+    analytics_api_test.go:181:   → POST /api/auth/login
+    analytics_api_test.go:181:   ← 200 {"id":"44444444-4444-4444-4444-444444444444","username":"auditor","display_name":"Auditor","status":"active","roles":["auditor"],"force_password_change":false,"created_at":"2026-04-17T16:30:07Z"}
+    analytics_api_test.go:188:   → POST /api/exports (auditor)
+    analytics_api_test.go:188:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+--- PASS: TestExportRoleForbidden (1.81s)
+=== RUN   TestExportOwnershipRestrictedForAuditor
+    analytics_api_test.go:196:   → POST /api/auth/login
+    analytics_api_test.go:196:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:09Z"}
+    analytics_api_test.go:197:   → POST /api/auth/login
+    analytics_api_test.go:197:   ← 200 {"id":"44444444-4444-4444-4444-444444444444","username":"auditor","display_name":"Auditor","status":"active","roles":["auditor"],"force_password_change":false,"created_at":"2026-04-17T16:30:09Z"}
+    analytics_api_test.go:203:   → POST /api/exports (admin)
+    analytics_api_test.go:203:   ← 201 {"created_at":"2026-04-17T16:30:10Z","format":"csv","id":"60b81cfc-e999-4879-bad4-15c4b0e6504a","scope":"bookings","status":"ready","truncated":false}
+    analytics_api_test.go:210:   → GET /api/exports (auditor)
+    analytics_api_test.go:210:   ← 200 []
+    analytics_api_test.go:219:   → GET /api/exports/:id/download (auditor)
+    analytics_api_test.go:219:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+--- PASS: TestExportOwnershipRestrictedForAuditor (2.27s)
+=== RUN   TestExportSegmentRequiresAdmin
+    analytics_api_test.go:227:   → POST /api/auth/login
+    analytics_api_test.go:227:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:12Z"}
+    analytics_api_test.go:228:   → POST /api/auth/login
+    analytics_api_test.go:228:   ← 200 {"id":"22222222-2222-2222-2222-222222222222","username":"operator","display_name":"Operator","status":"active","roles":["dispatch_operator"],"force_password_change":false,"created_at":"2026-04-17T16:30:12Z"}
+    analytics_api_test.go:235:   → POST /api/segments
+    analytics_api_test.go:235:   ← 201 {"filter_expression":{"arrears_balance_cents":{"gt":1}},"id":"e191548c-d069-4f54-a2e5-e06c7e27ff9f","name":"Segmented Export","schedule":"manual"}
+    analytics_api_test.go:246:   → POST /api/exports (segment by operator)
+    analytics_api_test.go:246:   ← 403 {"code":"FORBIDDEN","message":"segment access denied"}
+--- PASS: TestExportSegmentRequiresAdmin (2.50s)
+=== RUN   TestExportOccupancyCSV
+    analytics_api_test.go:254:   → POST /api/auth/login
+    analytics_api_test.go:254:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:14Z"}
+    analytics_api_test.go:260:   → POST /api/exports (occupancy)
+    analytics_api_test.go:260:   ← 201 {"created_at":"2026-04-17T16:30:15Z","format":"csv","id":"c33cbf4e-5ed4-4218-b35d-9b5b3f130acf","scope":"occupancy","status":"ready","truncated":false}
+    analytics_api_test.go:267:   → GET /api/exports/:id/download (occupancy)
+    analytics_api_test.go:267:   ← 200 snapshot_at,zone_id,authoritative_stalls
+--- PASS: TestExportOccupancyCSV (2.07s)
+=== RUN   TestExportExceptionsCSV
+    analytics_api_test.go:275:   → POST /api/auth/login
+    analytics_api_test.go:275:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:16Z"}
+    analytics_api_test.go:281:   → POST /api/exports (exceptions)
+    analytics_api_test.go:281:   ← 201 {"created_at":"2026-04-17T16:30:16Z","format":"csv","id":"5b3a6f0e-86b2-49ab-ae8d-1a3bae632fd9","scope":"exceptions","status":"ready","truncated":false}
+--- PASS: TestExportExceptionsCSV (1.91s)
+=== RUN   TestExportExcelCreateAndDownloadBinary
+    analytics_api_test.go:291:   → POST /api/auth/login
+    analytics_api_test.go:291:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:18Z"}
+    analytics_api_test.go:297:   → POST /api/exports (excel)
+    analytics_api_test.go:297:   ← 201 {"created_at":"2026-04-17T16:30:18Z","format":"excel","id":"9201c964-a353-493e-a042-3b02b7440fef","scope":"bookings","status":"ready","truncated":false}
+    analytics_api_test.go:307:   → GET /api/exports/:id/download (excel)
+    analytics_api_test.go:307:   ← 200 
+--- PASS: TestExportExcelCreateAndDownloadBinary (1.83s)
+=== RUN   TestExportPDFCreateAndDownloadBinary
+    analytics_api_test.go:328:   → POST /api/auth/login
+    analytics_api_test.go:328:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:20Z"}
+    analytics_api_test.go:334:   → POST /api/exports (pdf)
+    analytics_api_test.go:334:   ← 201 {"created_at":"2026-04-17T16:30:20Z","format":"pdf","id":"5f2c65bb-d070-4a09-92ee-904c9fafd4ee","scope":"exceptions","status":"ready","truncated":false}
+    analytics_api_test.go:344:   → GET /api/exports/:id/download (pdf)
+    analytics_api_test.go:344:   ← 200 
+--- PASS: TestExportPDFCreateAndDownloadBinary (2.04s)
+=== RUN   TestExportInvalidFormatRejected
+    analytics_api_test.go:365:   → POST /api/auth/login
+    analytics_api_test.go:365:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:22Z"}
+    analytics_api_test.go:371:   → POST /api/exports (xml)
+    analytics_api_test.go:371:   ← 400 {"code":"VALIDATION_ERROR","message":"invalid format or scope"}
+--- PASS: TestExportInvalidFormatRejected (2.20s)
+=== RUN   TestExportCSVBackwardCompatible
+    analytics_api_test.go:379:   → POST /api/auth/login
+    analytics_api_test.go:379:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:24Z"}
+    analytics_api_test.go:385:   → POST /api/exports (csv compat)
+    analytics_api_test.go:385:   ← 201 {"created_at":"2026-04-17T16:30:25Z","format":"csv","id":"c66a536b-a914-48fd-bc92-5c6ac484edc7","scope":"bookings","status":"ready","truncated":false}
+--- PASS: TestExportCSVBackwardCompatible (2.05s)
+=== RUN   TestExportSegmentStrictDeniedNoMatchingMembers
+    analytics_api_test.go:405:   → POST /api/auth/login
+    analytics_api_test.go:405:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:26Z"}
+    analytics_api_test.go:406:   → POST /api/auth/login
+    analytics_api_test.go:406:   ← 200 {"id":"22222222-2222-2222-2222-222222222222","username":"operator","display_name":"Operator","status":"active","roles":["dispatch_operator"],"force_password_change":false,"created_at":"2026-04-17T16:30:26Z"}
+    analytics_api_test.go:430:   → POST /api/exports (strict segment deny)
+    analytics_api_test.go:430:   ← 403 {"code":"FORBIDDEN","message":"segment access denied"}
+--- PASS: TestExportSegmentStrictDeniedNoMatchingMembers (2.40s)
+=== RUN   TestExportSegmentStrictAllowedMatchingMembers
+    analytics_api_test.go:438:   → POST /api/auth/login
+    analytics_api_test.go:438:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:29Z"}
+    analytics_api_test.go:439:   → POST /api/auth/login
+    analytics_api_test.go:439:   ← 200 {"id":"22222222-2222-2222-2222-222222222222","username":"operator","display_name":"Operator","status":"active","roles":["dispatch_operator"],"force_password_change":false,"created_at":"2026-04-17T16:30:29Z"}
+    analytics_api_test.go:466:   → POST /api/exports (strict segment allow)
+    analytics_api_test.go:466:   ← 201 {"created_at":"2026-04-17T16:30:29Z","format":"csv","id":"f0c7e43c-d85a-4b4c-ae90-5b1cbcd03460","scope":"bookings","status":"ready","truncated":false}
+--- PASS: TestExportSegmentStrictAllowedMatchingMembers (2.13s)
+=== RUN   TestExportSegmentAllowedForAdmin
+    analytics_api_test.go:474:   → POST /api/auth/login
+    analytics_api_test.go:474:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:31Z"}
+    analytics_api_test.go:491:   → POST /api/exports (segment by admin)
+    analytics_api_test.go:491:   ← 201 {"created_at":"2026-04-17T16:30:31Z","format":"csv","id":"639c971b-9096-4c94-810b-00ca154d25ec","scope":"bookings","status":"ready","truncated":false}
+--- PASS: TestExportSegmentAllowedForAdmin (1.98s)
+=== RUN   TestExportSegmentRowFilteringOnlyIncludesSegmentMembers
+    analytics_api_test.go:499:   → POST /api/auth/login
+    analytics_api_test.go:499:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:33Z"}
+    analytics_api_test.go:582:   → POST /api/exports (segment row filter)
+    analytics_api_test.go:582:   ← 201 {"created_at":"2026-04-17T16:30:33Z","format":"csv","id":"b9a25f3f-f1af-4eb9-8819-f18128e75875","scope":"bookings","status":"ready","truncated":false}
+--- PASS: TestExportSegmentRowFilteringOnlyIncludesSegmentMembers (2.13s)
+=== RUN   TestAnalyticsOccupancyMissingParams
+    analytics_api_test.go:604:   → POST /api/auth/login
+    analytics_api_test.go:604:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:35Z"}
+    analytics_api_test.go:607:   → GET /api/analytics/occupancy (no params)
+    analytics_api_test.go:607:   ← 400 {"code":"VALIDATION_ERROR","message":"from and to query params required"}
+--- PASS: TestAnalyticsOccupancyMissingParams (2.12s)
+=== RUN   TestLoginSuccess
+    auth_api_test.go:251:   → POST /api/auth/login
+    auth_api_test.go:251:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:37Z"}
+--- PASS: TestLoginSuccess (2.06s)
+=== RUN   TestLoginWrongPasswordIncrementsCounter
+    auth_api_test.go:273:   → POST /api/auth/login
+    auth_api_test.go:273:   ← 401 {"attempts_remaining":4,"code":"UNAUTHORIZED","message":"invalid credentials"}
+--- PASS: TestLoginWrongPasswordIncrementsCounter (2.56s)
+=== RUN   TestLoginFailCounterDecrementsCorrectly
+    auth_api_test.go:300:   → POST /api/auth/login
+    auth_api_test.go:300:   ← 401 {"attempts_remaining":4,"code":"UNAUTHORIZED","message":"invalid credentials"}
+    auth_api_test.go:300:   → POST /api/auth/login
+    auth_api_test.go:300:   ← 401 {"attempts_remaining":3,"code":"UNAUTHORIZED","message":"invalid credentials"}
+    auth_api_test.go:300:   → POST /api/auth/login
+    auth_api_test.go:300:   ← 401 {"attempts_remaining":2,"code":"UNAUTHORIZED","message":"invalid credentials"}
+--- PASS: TestLoginFailCounterDecrementsCorrectly (2.82s)
+=== RUN   TestLoginLockoutAfterFiveFails
+    auth_api_test.go:335:   → POST /api/auth/login
+    auth_api_test.go:335:   ← 401 {"attempts_remaining":4,"code":"UNAUTHORIZED","message":"invalid credentials"}
+    auth_api_test.go:335:   → POST /api/auth/login
+    auth_api_test.go:335:   ← 401 {"attempts_remaining":3,"code":"UNAUTHORIZED","message":"invalid credentials"}
+    auth_api_test.go:335:   → POST /api/auth/login
+    auth_api_test.go:335:   ← 401 {"attempts_remaining":2,"code":"UNAUTHORIZED","message":"invalid credentials"}
+    auth_api_test.go:335:   → POST /api/auth/login
+    auth_api_test.go:335:   ← 401 {"attempts_remaining":1,"code":"UNAUTHORIZED","message":"invalid credentials"}
+    auth_api_test.go:345:   → POST /api/auth/login
+    auth_api_test.go:345:   ← 429 {"code":"RATE_LIMITED","locked_until":"2026-04-17T16:45:46Z","message":"account is locked, try again later"}
+--- PASS: TestLoginLockoutAfterFiveFails (3.72s)
+=== RUN   TestLogoutAndMe
+    auth_api_test.go:361:   → POST /api/auth/login
+    auth_api_test.go:361:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:48Z"}
+    auth_api_test.go:365:   → GET /api/me
+    auth_api_test.go:365:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:48Z"}
+    auth_api_test.go:371:   → POST /api/auth/logout
+    auth_api_test.go:371:   ← 204 
+    auth_api_test.go:377:   → GET /api/me
+    auth_api_test.go:377:   ← 401 {"code":"UNAUTHORIZED","message":"authentication required"}
+--- PASS: TestLogoutAndMe (2.07s)
+=== RUN   TestAdminResetPasswordNoTokenInResponse
+    auth_api_test.go:390:   → POST /api/auth/login
+    auth_api_test.go:390:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:50Z"}
+    auth_api_test.go:396:   → POST /api/admin/users/22222222-2222-2222-2222-222222222222/reset-password
+    auth_api_test.go:396:   ← 200 {"message":"password reset, user must change on next login"}
+--- PASS: TestAdminResetPasswordNoTokenInResponse (2.20s)
+=== RUN   TestForcePasswordChangeBlocksRoutesExceptPatch
+    auth_api_test.go:429:   → POST /api/auth/login
+    auth_api_test.go:429:   ← 200 {"id":"22222222-2222-2222-2222-222222222222","username":"operator","display_name":"Operator","status":"active","roles":["dispatch_operator"],"force_password_change":true,"created_at":"2026-04-17T16:30:52Z"}
+    auth_api_test.go:436:   → GET /api/me
+    auth_api_test.go:436:   ← 403 {"code":"FORBIDDEN","message":"password change required"}
+    auth_api_test.go:445:   → PATCH /api/me/password
+    auth_api_test.go:445:   ← 200 {"message":"password changed"}
+--- PASS: TestForcePasswordChangeBlocksRoutesExceptPatch (2.35s)
+=== RUN   TestAdminUnlockAccount
+    auth_api_test.go:463:   → POST /api/auth/login
+    auth_api_test.go:463:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:55Z"}
+    auth_api_test.go:467:   → POST /api/admin/users/22222222-2222-2222-2222-222222222222/unlock
+    auth_api_test.go:467:   ← 200 {"message":"account unlocked"}
+--- PASS: TestAdminUnlockAccount (2.37s)
+=== RUN   TestAdminListAndDeleteUserSessions
+    auth_api_test.go:490:   → POST /api/auth/login
+    auth_api_test.go:490:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:30:58Z"}
+    auth_api_test.go:497:   → POST /api/auth/login
+    auth_api_test.go:497:   ← 200 {"id":"22222222-2222-2222-2222-222222222222","username":"operator","display_name":"Operator","status":"active","roles":["dispatch_operator"],"force_password_change":false,"created_at":"2026-04-17T16:30:58Z"}
+    auth_api_test.go:503:   → GET /api/admin/users/22222222-2222-2222-2222-222222222222/sessions
+    auth_api_test.go:503:   ← 200 [{"id":"abff562b-acef-47b9-a0be-9ab4d32462b2","created_at":"2026-04-17T16:30:58Z","last_active_at":"2026-04-17T16:30:58Z","expires_at":"2026-04-17T17:00:58Z"}]
+    auth_api_test.go:512:   → DELETE /api/admin/users/22222222-2222-2222-2222-222222222222/sessions
+    auth_api_test.go:512:   ← 204 
+--- PASS: TestAdminListAndDeleteUserSessions (3.31s)
+=== RUN   TestFleetCrossOrgReadScopes
+    authorization_scope_api_test.go:12:   → POST /api/auth/login
+    authorization_scope_api_test.go:12:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:01Z"}
+    authorization_scope_api_test.go:13:   → POST /api/auth/login
+    authorization_scope_api_test.go:13:   ← 200 {"id":"33333333-3333-3333-3333-333333333333","username":"fleet","display_name":"Fleet","status":"active","roles":["fleet_manager"],"force_password_change":false,"created_at":"2026-04-17T16:31:01Z"}
+    authorization_scope_api_test.go:15:   → POST /api/facilities
+    authorization_scope_api_test.go:15:   ← 201 {"id":"0b9429d9-de62-4baa-88e5-1936af12cff2"}
+    authorization_scope_api_test.go:15:   → POST /api/lots
+    authorization_scope_api_test.go:15:   ← 201 {"id":"490e1bae-1433-4712-811a-e8a687a44fe5"}
+    authorization_scope_api_test.go:15:   → POST /api/zones
+    authorization_scope_api_test.go:15:   ← 201 {"id":"77f1a921-063f-4393-a96d-ae57530b620f"}
+    authorization_scope_api_test.go:15:   → POST /api/members
+    authorization_scope_api_test.go:15:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:02Z","display_name":"Member Res","id":"504c3e70-0299-435f-9731-25b109da944a","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    authorization_scope_api_test.go:15:   → POST /api/vehicles
+    authorization_scope_api_test.go:15:   ← 201 {"id":"bf863263-99d6-4747-af03-b5ae7853d24d"}
+    authorization_scope_api_test.go:20:   → POST /api/tags
+    authorization_scope_api_test.go:20:   ← 201 {"id":"b3ce8754-55b5-4eb0-b4f9-d635a503a953","name":"scope_tag"}
+    authorization_scope_api_test.go:29:   → POST /api/members/:id/tags
+    authorization_scope_api_test.go:29:   ← 200 {"message":"tag added"}
+    authorization_scope_api_test.go:44:   → POST /api/reservations/hold
+    authorization_scope_api_test.go:44:   ← 201 {"available_stalls":1,"hold_expires_at":"2026-04-17T16:46:02Z","id":"45d6f3e5-4feb-4f8f-8f18-48d99fb50ab8","status":"hold","time_window_end":"2026-04-17T20:31:02Z","time_window_start":"2026-04-17T18:31:02Z"}
+    authorization_scope_api_test.go:51:   → GET /api/reservations (fleet)
+    authorization_scope_api_test.go:51:   ← 200 {"items":[],"total":0}
+    authorization_scope_api_test.go:59:   → POST /api/facilities
+    authorization_scope_api_test.go:59:   ← 201 {"id":"fefc0785-f322-4aee-b286-f0526e292897"}
+    authorization_scope_api_test.go:59:   → POST /api/lots
+    authorization_scope_api_test.go:59:   ← 201 {"id":"a5a68b4b-33e4-4e8a-a33d-07b9a1e7415d"}
+    authorization_scope_api_test.go:59:   → POST /api/zones
+    authorization_scope_api_test.go:59:   ← 201 {"id":"a1991f90-3136-457b-baf2-0bfa80b79d13"}
+    authorization_scope_api_test.go:59:   → POST /api/members
+    authorization_scope_api_test.go:59:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:02Z","display_name":"Member Res","id":"58794cc7-acc2-4696-9f46-0e359b258e04","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    authorization_scope_api_test.go:59:   → POST /api/vehicles
+    authorization_scope_api_test.go:59:   ← 201 {"id":"09d96bcc-2e42-4183-bccd-53e518231f7b"}
+    authorization_scope_api_test.go:59:   → POST /api/devices
+    authorization_scope_api_test.go:59:   ← 201 {"id":"f1fdc4ab-8c4f-485b-96d5-31dfc4f0f252"}
+    authorization_scope_api_test.go:61:   → GET /api/devices (fleet)
+    authorization_scope_api_test.go:61:   ← 200 []
+    authorization_scope_api_test.go:70:   → GET /api/devices/:id (fleet)
+    authorization_scope_api_test.go:70:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+    authorization_scope_api_test.go:80:   → POST /api/tracking/location
+    authorization_scope_api_test.go:80:   ← 201 {"confirmed":true,"device_time_trusted":false,"id":"4003e3dc-66dd-4887-92fa-f8e119ecbc9a","suspect":false}
+    authorization_scope_api_test.go:86:   → GET /api/tracking/vehicles/:id/positions (fleet)
+    authorization_scope_api_test.go:86:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+    authorization_scope_api_test.go:92:   → GET /api/tracking/vehicles/:id/stops (fleet)
+    authorization_scope_api_test.go:92:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+    authorization_scope_api_test.go:98:   → GET /api/members/:id/tags (fleet)
+    authorization_scope_api_test.go:98:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+    authorization_scope_api_test.go:106:   → POST /api/members/:id/tags (fleet)
+    authorization_scope_api_test.go:106:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+    authorization_scope_api_test.go:112:   → DELETE /api/members/:id/tags/:tagId (fleet)
+    authorization_scope_api_test.go:112:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+--- PASS: TestFleetCrossOrgReadScopes (3.37s)
+=== RUN   TestCampaignTaskReminderStopsAfterComplete
+    campaigns_api_test.go:15:   → POST /api/auth/login
+    campaigns_api_test.go:15:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:04Z"}
+    campaigns_api_test.go:18:   → GET /api/notification-topics
+    campaigns_api_test.go:18:   ← 200 [{"id":"211a0600-95ce-4e74-b212-469c1a7123d1","name":"arrears_reminder","subscribed":false},{"id":"6790f7da-fcf3-49d5-a866-d710450ed4a5","name":"booking_changed","subscribed":false},{"id":"301af4f3-7d03-4af3-a44c-8178163738f1","name":"booking_success","subscribed":false},{"id":"dae80db3-bb03-4107-8d49-8fe2aaeba8ea","name":"expiry_approaching","subscribed":false},{"id":"41819dc0-55a5-453d-a627-a9837629c367","name":"task_reminder","subscribed":false}]
+    campaigns_api_test.go:25:   → POST /api/notification-topics/:id/subscribe
+    campaigns_api_test.go:25:   ← 200 {"message":"subscribed"}
+    campaigns_api_test.go:34:   → POST /api/campaigns
+    campaigns_api_test.go:34:   ← 201 {"description":"nightly checks","id":"827184b4-c5ed-45a1-beda-dcc996c3208e","target_role":"","title":"Ops Checks"}
+    campaigns_api_test.go:45:   → POST /api/campaigns/:id/tasks
+    campaigns_api_test.go:45:   ← 201 {"campaign_id":"827184b4-c5ed-45a1-beda-dcc996c3208e","description":"Check gate A","id":"fb08b1a2-5b5a-4075-a821-a298ad7d60e5","reminder_interval_minutes":1}
+    campaigns_api_test.go:57:   → GET /api/notifications
+    campaigns_api_test.go:57:   ← 200 {"items":[{"body":"Check gate A","created_at":"2026-04-17T16:31:05Z","dismissed":false,"id":"76fc0faf-9272-4e34-9d9c-a210b0f16aa3","read":false,"title":"Task reminder"}],"page":1,"total":1}
+    campaigns_api_test.go:74:   → POST /api/tasks/:id/complete
+    campaigns_api_test.go:74:   ← 200 {"campaign_id":"827184b4-c5ed-45a1-beda-dcc996c3208e","completed_at":"2026-04-17T16:31:05Z","created_at":"2026-04-17T16:31:05Z","deadline":"2026-04-17T14:31:05Z","description":"Check gate A","id":"fb08b1a2-5b5a-4075-a821-a298ad7d60e5","last_reminder_at":"2026-04-17T16:31:05Z","reminder_interval_minutes":1,"updated_at":"2026-04-17T16:31:05Z"}
+--- PASS: TestCampaignTaskReminderStopsAfterComplete (2.59s)
+=== RUN   TestCampaignReminderTargetRoleFiltering
+    campaigns_api_test.go:97:   → POST /api/auth/login
+    campaigns_api_test.go:97:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:07Z"}
+    campaigns_api_test.go:111:   → POST /api/auth/login
+    campaigns_api_test.go:111:   ← 200 {"id":"22222222-2222-2222-2222-222222222222","username":"operator","display_name":"Operator","status":"active","roles":["dispatch_operator"],"force_password_change":false,"created_at":"2026-04-17T16:31:07Z"}
+--- PASS: TestCampaignReminderTargetRoleFiltering (2.26s)
+=== RUN   TestCampaignAndTaskCRUDEndpoints
+    campaigns_api_test.go:174:   → POST /api/auth/login
+    campaigns_api_test.go:174:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:09Z"}
+    campaigns_api_test.go:180:   → POST /api/campaigns
+    campaigns_api_test.go:180:   ← 201 {"description":"open checklist","id":"bec70c78-1377-4303-bf39-11ac776a7e5e","target_role":"","title":"Morning Ops"}
+    campaigns_api_test.go:187:   → GET /api/campaigns/:id
+    campaigns_api_test.go:187:   ← 200 {"created_at":"2026-04-17T16:31:09Z","created_by":"11111111-1111-1111-1111-111111111111","description":"open checklist","id":"bec70c78-1377-4303-bf39-11ac776a7e5e","title":"Morning Ops","updated_at":"2026-04-17T16:31:09Z"}
+    campaigns_api_test.go:195:   → PATCH /api/campaigns/:id
+    campaigns_api_test.go:195:   ← 200 {"message":"updated"}
+    campaigns_api_test.go:204:   → POST /api/campaigns/:id/tasks
+    campaigns_api_test.go:204:   ← 201 {"campaign_id":"bec70c78-1377-4303-bf39-11ac776a7e5e","description":"Check zone lights","id":"1c72f4f4-6da3-4fe8-9a00-f6d7314da4fc","reminder_interval_minutes":10}
+    campaigns_api_test.go:211:   → GET /api/campaigns/:id/tasks
+    campaigns_api_test.go:211:   ← 200 [{"campaign_id":"bec70c78-1377-4303-bf39-11ac776a7e5e","created_at":"2026-04-17T16:31:09Z","description":"Check zone lights","id":"1c72f4f4-6da3-4fe8-9a00-f6d7314da4fc","reminder_interval_minutes":10,"updated_at":"2026-04-17T16:31:09Z"}]
+    campaigns_api_test.go:219:   → PATCH /api/tasks/:id
+    campaigns_api_test.go:219:   ← 200 {"message":"updated"}
+    campaigns_api_test.go:225:   → GET /api/tasks/:id
+    campaigns_api_test.go:225:   ← 200 {"campaign_id":"bec70c78-1377-4303-bf39-11ac776a7e5e","created_at":"2026-04-17T16:31:09Z","description":"Check zone lights and signage","id":"1c72f4f4-6da3-4fe8-9a00-f6d7314da4fc","reminder_interval_minutes":10,"updated_at":"2026-04-17T16:31:09Z"}
+    campaigns_api_test.go:231:   → DELETE /api/tasks/:id
+    campaigns_api_test.go:231:   ← 204 
+    campaigns_api_test.go:237:   → DELETE /api/campaigns/:id
+    campaigns_api_test.go:237:   ← 204 
+--- PASS: TestCampaignAndTaskCRUDEndpoints (2.12s)
+=== RUN   TestCampaignTaskReminderHonorsDND
+    campaigns_api_test.go:245:   → POST /api/auth/login
+    campaigns_api_test.go:245:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:12Z"}
+    campaigns_api_test.go:248:   → GET /api/notification-topics
+    campaigns_api_test.go:248:   ← 200 [{"id":"2d270ff2-33db-4bb6-9377-53e536d50bd7","name":"arrears_reminder","subscribed":false},{"id":"364e299d-83c3-459d-be12-a6e5723abb63","name":"booking_changed","subscribed":false},{"id":"8d6fe360-25ec-45ee-91c1-92a42cc50b5e","name":"booking_success","subscribed":false},{"id":"df916115-3c0b-455b-b74e-2dcb84b7b773","name":"expiry_approaching","subscribed":false},{"id":"237aee8e-1145-44b5-b465-29295581530b","name":"task_reminder","subscribed":false}]
+    campaigns_api_test.go:255:   → POST /api/notification-topics/:id/subscribe
+    campaigns_api_test.go:255:   ← 200 {"message":"subscribed"}
+    campaigns_api_test.go:265:   → PATCH /api/notification-settings/dnd
+    campaigns_api_test.go:265:   ← 200 {"enabled":true,"end_time":"23:59","start_time":"00:00"}
+    campaigns_api_test.go:274:   → POST /api/campaigns
+    campaigns_api_test.go:274:   ← 201 {"description":"dnd task reminders","id":"1b5aafe9-e057-4c45-a1a6-2057c9026221","target_role":"","title":"DND Ops Checks"}
+    campaigns_api_test.go:285:   → POST /api/campaigns/:id/tasks
+    campaigns_api_test.go:285:   ← 201 {"campaign_id":"1b5aafe9-e057-4c45-a1a6-2057c9026221","description":"Check gate B","id":"c0bf45ec-4922-4fd3-817b-d821ddb73f11","reminder_interval_minutes":1}
+--- PASS: TestCampaignTaskReminderHonorsDND (2.77s)
+=== RUN   TestRegisterDevice
+    devices_api_test.go:29:   → POST /api/auth/login
+    devices_api_test.go:29:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:14Z"}
+    devices_api_test.go:30:   → POST /api/facilities
+    devices_api_test.go:30:   ← 201 {"id":"19cc5510-3d79-4a01-918f-b07313bc8858"}
+    devices_api_test.go:30:   → POST /api/lots
+    devices_api_test.go:30:   ← 201 {"id":"a4699f4c-abb5-410c-8738-93cf8a921d09"}
+    devices_api_test.go:30:   → POST /api/zones
+    devices_api_test.go:30:   ← 201 {"id":"343efbbd-5922-423b-bdeb-6820665e23f6"}
+    devices_api_test.go:30:   → POST /api/members
+    devices_api_test.go:30:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:14Z","display_name":"Member Res","id":"5965514b-933b-4b72-9cf3-16bf8f6dcd30","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    devices_api_test.go:30:   → POST /api/vehicles
+    devices_api_test.go:30:   ← 201 {"id":"95b0ada3-7c8b-4558-82ae-cde6227e9165"}
+    devices_api_test.go:30:   → POST /api/devices
+    devices_api_test.go:30:   ← 201 {"id":"c4ea9122-7486-4a85-83b3-cd90085b7678"}
+    devices_api_test.go:33:   → GET /api/devices
+    devices_api_test.go:33:   ← 200 [{"device_key":"device-key-163114.602182","device_type":"camera","id":"c4ea9122-7486-4a85-83b3-cd90085b7678","organization_id":null,"registered_at":"2026-04-17T16:31:14Z","status":"online","zone_id":"343efbbd-5922-423b-bdeb-6820665e23f6"}]
+    devices_api_test.go:39:   → GET /api/devices/:id
+    devices_api_test.go:39:   ← 200 {"device_key":"device-key-163114.602182","device_type":"camera","id":"c4ea9122-7486-4a85-83b3-cd90085b7678","organization_id":null,"registered_at":"2026-04-17T16:31:14Z","status":"online","zone_id":"343efbbd-5922-423b-bdeb-6820665e23f6"}
+    devices_api_test.go:45:   → PATCH /api/devices/:id
+    devices_api_test.go:45:   ← 200 {"message":"updated"}
+    devices_api_test.go:51:   → DELETE /api/devices/:id
+    devices_api_test.go:51:   ← 204 
+--- PASS: TestRegisterDevice (2.23s)
+=== RUN   TestIngestDeviceEvent
+    devices_api_test.go:59:   → POST /api/auth/login
+    devices_api_test.go:59:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:15Z"}
+    devices_api_test.go:60:   → POST /api/facilities
+    devices_api_test.go:60:   ← 201 {"id":"3d83b95d-a10e-4e2a-bf2b-92099443b2af"}
+    devices_api_test.go:60:   → POST /api/lots
+    devices_api_test.go:60:   ← 201 {"id":"b2a6b38b-e760-4ae5-aad5-56ed4e95fec8"}
+    devices_api_test.go:60:   → POST /api/zones
+    devices_api_test.go:60:   ← 201 {"id":"c8a98c07-0988-4b19-aac9-fadba04906ed"}
+    devices_api_test.go:60:   → POST /api/members
+    devices_api_test.go:60:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:15Z","display_name":"Member Res","id":"50404ec6-022b-4935-90b0-aad36481f5fa","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    devices_api_test.go:60:   → POST /api/vehicles
+    devices_api_test.go:60:   ← 201 {"id":"b73c8a0c-2449-456c-90ad-fd847b769b96"}
+    devices_api_test.go:60:   → POST /api/devices
+    devices_api_test.go:60:   ← 201 {"id":"dff19fc6-5ef2-4a32-8159-97925bd8e3f8"}
+    devices_api_test.go:69:   → POST /api/device-events
+    devices_api_test.go:69:   ← 201 {"id":"8756bb1c-a008-49b4-ad34-297d765de8a1","late":false,"reordered":false}
+--- PASS: TestIngestDeviceEvent (1.29s)
+=== RUN   TestIngestMissingDeviceID
+    devices_api_test.go:77:   → POST /api/auth/login
+    devices_api_test.go:77:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:16Z"}
+    devices_api_test.go:84:   → POST /api/device-events
+    devices_api_test.go:84:   ← 400 {"code":"VALIDATION_ERROR","message":"missing required device event fields"}
+--- PASS: TestIngestMissingDeviceID (1.17s)
+=== RUN   TestIngestMissingSequenceNumberAndEventKey
+    devices_api_test.go:92:   → POST /api/auth/login
+    devices_api_test.go:92:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:17Z"}
+    devices_api_test.go:93:   → POST /api/facilities
+    devices_api_test.go:93:   ← 201 {"id":"7da55c27-0186-4beb-ba7e-a6f743fc1988"}
+    devices_api_test.go:93:   → POST /api/lots
+    devices_api_test.go:93:   ← 201 {"id":"e59d36c1-e830-4654-91b6-2d5689dd9c13"}
+    devices_api_test.go:93:   → POST /api/zones
+    devices_api_test.go:93:   ← 201 {"id":"e61665ca-2fdb-455a-a82d-fc4083374fd0"}
+    devices_api_test.go:93:   → POST /api/members
+    devices_api_test.go:93:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:18Z","display_name":"Member Res","id":"2dd780a9-47e7-4ae0-977e-ddc61dce60b9","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    devices_api_test.go:93:   → POST /api/vehicles
+    devices_api_test.go:93:   ← 201 {"id":"cd2f0f23-b7e0-4883-bf7f-2ec9b0bb78a4"}
+    devices_api_test.go:93:   → POST /api/devices
+    devices_api_test.go:93:   ← 201 {"id":"aea90e0e-f1a1-475f-8904-7de776da5afd"}
+    devices_api_test.go:100:   → POST /api/device-events
+    devices_api_test.go:100:   ← 400 {"code":"VALIDATION_ERROR","message":"missing required device event fields"}
+    devices_api_test.go:110:   → POST /api/device-events
+    devices_api_test.go:110:   ← 400 {"code":"VALIDATION_ERROR","message":"missing required device event fields"}
+--- PASS: TestIngestMissingSequenceNumberAndEventKey (1.15s)
+=== RUN   TestIngestDuplicateEventKey
+    devices_api_test.go:118:   → POST /api/auth/login
+    devices_api_test.go:118:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:19Z"}
+    devices_api_test.go:119:   → POST /api/facilities
+    devices_api_test.go:119:   ← 201 {"id":"49af0042-22a8-44ce-9895-a42013f649aa"}
+    devices_api_test.go:119:   → POST /api/lots
+    devices_api_test.go:119:   ← 201 {"id":"19d67d10-55ed-45c3-b163-2a2868bae105"}
+    devices_api_test.go:119:   → POST /api/zones
+    devices_api_test.go:119:   ← 201 {"id":"1af5220e-548c-4dfd-b9df-eb705c74e9ff"}
+    devices_api_test.go:119:   → POST /api/members
+    devices_api_test.go:119:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:19Z","display_name":"Member Res","id":"6c674f68-c6e8-4e44-b825-42d88643d962","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    devices_api_test.go:119:   → POST /api/vehicles
+    devices_api_test.go:119:   ← 201 {"id":"b222a37a-7b5d-4750-9c58-2e8747d4a6df"}
+    devices_api_test.go:119:   → POST /api/devices
+    devices_api_test.go:119:   ← 201 {"id":"7661dccf-60e8-4f6c-bda1-3fa7bbabc4a4"}
+    devices_api_test.go:127:   → POST /api/device-events
+    devices_api_test.go:127:   ← 201 {"id":"19483689-29d6-4db0-9609-f8941afc365c","late":false,"reordered":false}
+    devices_api_test.go:137:   → POST /api/device-events
+    devices_api_test.go:137:   ← 200 {"status":"already_processed"}
+--- PASS: TestIngestDuplicateEventKey (1.31s)
+=== RUN   TestReplayEventAndDuplicateReplay
+    devices_api_test.go:145:   → POST /api/auth/login
+    devices_api_test.go:145:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:20Z"}
+    devices_api_test.go:146:   → POST /api/facilities
+    devices_api_test.go:146:   ← 201 {"id":"5a2bc2fa-a573-44e4-94df-b68a5a5faab5"}
+    devices_api_test.go:146:   → POST /api/lots
+    devices_api_test.go:146:   ← 201 {"id":"4ce9792e-28a9-48c1-b897-a18d26c220dc"}
+    devices_api_test.go:146:   → POST /api/zones
+    devices_api_test.go:146:   ← 201 {"id":"3e4db430-718c-4220-a4f4-02180be0e773"}
+    devices_api_test.go:146:   → POST /api/members
+    devices_api_test.go:146:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:20Z","display_name":"Member Res","id":"d8e2991a-303a-4f89-a40b-e18b240d28c2","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    devices_api_test.go:146:   → POST /api/vehicles
+    devices_api_test.go:146:   ← 201 {"id":"f6733fa5-e1fe-4950-adc8-093ef6861975"}
+    devices_api_test.go:146:   → POST /api/devices
+    devices_api_test.go:146:   ← 201 {"id":"b166f9ff-9e9d-4563-8823-f5e625963bcd"}
+    devices_api_test.go:157:   → POST /api/device-events
+    devices_api_test.go:157:   ← 201 {"id":"ec22d4d7-fddd-42c1-8952-4f8627617029","late":false,"reordered":false}
+    devices_api_test.go:160:   → POST /api/device-events/replay
+    devices_api_test.go:160:   ← 200 {"replayed":1,"skipped":0}
+    devices_api_test.go:166:   → POST /api/device-events/replay
+    devices_api_test.go:166:   ← 200 {"replayed":0,"skipped":1}
+--- PASS: TestReplayEventAndDuplicateReplay (1.19s)
+=== RUN   TestListDeviceEvents
+    devices_api_test.go:174:   → POST /api/auth/login
+    devices_api_test.go:174:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:21Z"}
+    devices_api_test.go:175:   → POST /api/facilities
+    devices_api_test.go:175:   ← 201 {"id":"f596f5c8-3733-413c-8c9b-d7a1d96f65ff"}
+    devices_api_test.go:175:   → POST /api/lots
+    devices_api_test.go:175:   ← 201 {"id":"398aaa89-4036-40ea-9db4-f3b476e1b384"}
+    devices_api_test.go:175:   → POST /api/zones
+    devices_api_test.go:175:   ← 201 {"id":"285a7e0c-4c4e-4195-abb4-4e926034c671"}
+    devices_api_test.go:175:   → POST /api/members
+    devices_api_test.go:175:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:21Z","display_name":"Member Res","id":"6096e34e-1a36-4c86-98be-7ff395f0af76","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    devices_api_test.go:175:   → POST /api/vehicles
+    devices_api_test.go:175:   ← 201 {"id":"61d3d324-9888-4dbc-b9da-6834a77cd29f"}
+    devices_api_test.go:175:   → POST /api/devices
+    devices_api_test.go:175:   ← 201 {"id":"e9615c5d-41ed-4937-9326-dffff405560a"}
+    devices_api_test.go:183:   → POST /api/device-events
+    devices_api_test.go:183:   ← 201 {"id":"b092f6b6-f8b0-4902-83c1-db6bc44c35ad","late":false,"reordered":false}
+    devices_api_test.go:186:   → GET /api/device-events
+    devices_api_test.go:186:   ← 200 {"items":[{"device_id":"e9615c5d-41ed-4937-9326-dffff405560a","device_time_trusted":false,"event_key":"ev-list","event_type":"sensor_trigger","id":"b092f6b6-f8b0-4902-83c1-db6bc44c35ad","late":false,"payload":null,"processed":false,"received_at":"2026-04-17T16:31:21Z","sequence_number":5}],"page":1,"total":1}
+--- PASS: TestListDeviceEvents (1.26s)
+=== RUN   TestLateEventFlag
+    devices_api_test.go:194:   → POST /api/auth/login
+    devices_api_test.go:194:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:22Z"}
+    devices_api_test.go:195:   → POST /api/facilities
+    devices_api_test.go:195:   ← 201 {"id":"4b3e829d-75d7-44da-a1ec-27a4d5161e20"}
+    devices_api_test.go:195:   → POST /api/lots
+    devices_api_test.go:195:   ← 201 {"id":"c2ffc753-dc2f-4035-b073-75d939a71cde"}
+    devices_api_test.go:195:   → POST /api/zones
+    devices_api_test.go:195:   ← 201 {"id":"c7ecfa72-c3ab-4abf-8ad1-013d9675d52e"}
+    devices_api_test.go:195:   → POST /api/members
+    devices_api_test.go:195:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:23Z","display_name":"Member Res","id":"463b6598-779b-4f9e-b7d9-629939c65f96","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    devices_api_test.go:195:   → POST /api/vehicles
+    devices_api_test.go:195:   ← 201 {"id":"dacfbda0-8d39-44cc-80c1-f340e5423b59"}
+    devices_api_test.go:195:   → POST /api/devices
+    devices_api_test.go:195:   ← 201 {"id":"7ccfb7ce-9d82-4773-ad4d-c4de5f8c2579"}
+    devices_api_test.go:203:   → POST /api/device-events
+    devices_api_test.go:203:   ← 201 {"id":"63097e75-1f3e-401a-8d4b-fad0380ec608","late":false,"reordered":false}
+    devices_api_test.go:219:   → POST /api/device-events
+    devices_api_test.go:219:   ← 201 {"id":"4c769839-d9b9-49d1-ba14-a00ac19a2e0e","late":true,"reordered":false}
+--- PASS: TestLateEventFlag (1.26s)
+=== RUN   TestDeviceEventInvalidSignatureNotTrusted
+    devices_api_test.go:227:   → POST /api/auth/login
+    devices_api_test.go:227:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:24Z"}
+    devices_api_test.go:228:   → POST /api/facilities
+    devices_api_test.go:228:   ← 201 {"id":"9441d2e5-8347-4308-b0e1-0652c1c848c3"}
+    devices_api_test.go:228:   → POST /api/lots
+    devices_api_test.go:228:   ← 201 {"id":"0621acf5-9d3f-4ca7-92e9-dfcebfc840f0"}
+    devices_api_test.go:228:   → POST /api/zones
+    devices_api_test.go:228:   ← 201 {"id":"8b75d87a-d3f9-43f2-ab43-4749526103cd"}
+    devices_api_test.go:228:   → POST /api/members
+    devices_api_test.go:228:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:24Z","display_name":"Member Res","id":"7d0a4689-8310-4920-a3d2-3de217565c72","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    devices_api_test.go:228:   → POST /api/vehicles
+    devices_api_test.go:228:   ← 201 {"id":"922fc15d-3814-4226-bd1b-2a1f819738cd"}
+    devices_api_test.go:228:   → POST /api/devices
+    devices_api_test.go:228:   ← 201 {"id":"9aaa44bd-2f2a-4b8b-a193-d66f61efb97f"}
+    devices_api_test.go:239:   → POST /api/device-events
+    devices_api_test.go:239:   ← 201 {"id":"5acb8390-a67e-49f0-b1b7-95e123ce6b5d","late":false,"reordered":false}
+    devices_api_test.go:245:   → GET /api/device-events
+    devices_api_test.go:245:   ← 200 {"items":[{"device_id":"9aaa44bd-2f2a-4b8b-a193-d66f61efb97f","device_time":"2026-04-17T16:31:24Z","device_time_trusted":false,"event_key":"ev-invalid-signature","event_type":"camera_ping","id":"5acb8390-a67e-49f0-b1b7-95e123ce6b5d","late":false,"payload":null,"processed":false,"received_at":"2026-04-17T16:31:24Z","sequence_number":11}],"page":1,"total":1}
+--- PASS: TestDeviceEventInvalidSignatureNotTrusted (1.17s)
+=== RUN   TestExceptionsOpenListAndGet
+    exceptions_api_test.go:54:   → POST /api/auth/login
+    exceptions_api_test.go:54:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:25Z"}
+    exceptions_api_test.go:55:   → POST /api/facilities
+    exceptions_api_test.go:55:   ← 201 {"id":"b0b38dfd-40bb-4682-88a3-a9378382b552"}
+    exceptions_api_test.go:55:   → POST /api/lots
+    exceptions_api_test.go:55:   ← 201 {"id":"a91649ae-5f05-4936-884f-7c5f9ec5b3f2"}
+    exceptions_api_test.go:55:   → POST /api/zones
+    exceptions_api_test.go:55:   ← 201 {"id":"f9be96d0-e8d9-4298-b8ae-cdfedf187627"}
+    exceptions_api_test.go:55:   → POST /api/members
+    exceptions_api_test.go:55:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:25Z","display_name":"Member Res","id":"3caf1260-9bf8-48b4-b251-7d83b488929a","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    exceptions_api_test.go:55:   → POST /api/vehicles
+    exceptions_api_test.go:55:   ← 201 {"id":"85b2fbeb-3b2c-4e7c-a117-2e3b3a5998da"}
+    exceptions_api_test.go:55:   → POST /api/devices
+    exceptions_api_test.go:55:   ← 201 {"id":"0603f09e-3848-4eac-86bf-00b3268dd029"}
+    exceptions_api_test.go:55:   → POST /api/device-events
+    exceptions_api_test.go:55:   ← 201 {"id":"a06c8834-75be-4ac4-9892-b9634d3d6b78","late":false,"reordered":false}
+    exceptions_api_test.go:55:   → GET /api/exceptions
+    exceptions_api_test.go:55:   ← 200 {"items":[{"created_at":"2026-04-17T16:31:25Z","device_id":"0603f09e-3848-4eac-86bf-00b3268dd029","exception_type":"gate_stuck","id":"bbcb8f01-2738-47c5-8226-5e3e63963272","status":"open"}],"total":1}
+    exceptions_api_test.go:58:   → GET /api/exceptions
+    exceptions_api_test.go:58:   ← 200 {"items":[{"created_at":"2026-04-17T16:31:25Z","device_id":"0603f09e-3848-4eac-86bf-00b3268dd029","exception_type":"gate_stuck","id":"bbcb8f01-2738-47c5-8226-5e3e63963272","status":"open"}],"total":1}
+    exceptions_api_test.go:64:   → GET /api/exceptions/:id
+    exceptions_api_test.go:64:   ← 200 {"created_at":"2026-04-17T16:31:25Z","device_id":"0603f09e-3848-4eac-86bf-00b3268dd029","exception_type":"gate_stuck","id":"bbcb8f01-2738-47c5-8226-5e3e63963272","status":"open"}
+--- PASS: TestExceptionsOpenListAndGet (1.20s)
+=== RUN   TestAcknowledgeExceptionAsDispatchAndHistory
+    exceptions_api_test.go:72:   → POST /api/auth/login
+    exceptions_api_test.go:72:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:26Z"}
+    exceptions_api_test.go:73:   → POST /api/auth/login
+    exceptions_api_test.go:73:   ← 200 {"id":"22222222-2222-2222-2222-222222222222","username":"operator","display_name":"Operator","status":"active","roles":["dispatch_operator"],"force_password_change":false,"created_at":"2026-04-17T16:31:26Z"}
+    exceptions_api_test.go:74:   → POST /api/facilities
+    exceptions_api_test.go:74:   ← 201 {"id":"9be3026d-7a9b-4b0b-83c4-28744d5d4443"}
+    exceptions_api_test.go:74:   → POST /api/lots
+    exceptions_api_test.go:74:   ← 201 {"id":"d4031cff-57c7-45b1-bb9c-70d759b588a1"}
+    exceptions_api_test.go:74:   → POST /api/zones
+    exceptions_api_test.go:74:   ← 201 {"id":"5f4eab9c-235f-45e7-b27a-c25b077a8b97"}
+    exceptions_api_test.go:74:   → POST /api/members
+    exceptions_api_test.go:74:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:27Z","display_name":"Member Res","id":"9ee23f3d-d52e-4e53-a34a-bed25a4bcebe","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    exceptions_api_test.go:74:   → POST /api/vehicles
+    exceptions_api_test.go:74:   ← 201 {"id":"0cbc7187-45dd-4648-aace-041c9a7dd498"}
+    exceptions_api_test.go:74:   → POST /api/devices
+    exceptions_api_test.go:74:   ← 201 {"id":"dc67ce8d-f9a4-4ed7-8a30-40770113b121"}
+    exceptions_api_test.go:74:   → POST /api/device-events
+    exceptions_api_test.go:74:   ← 201 {"id":"a8f56b3c-e3ca-421a-8112-ef244f7b4924","late":false,"reordered":false}
+    exceptions_api_test.go:74:   → GET /api/exceptions
+    exceptions_api_test.go:74:   ← 200 {"items":[{"created_at":"2026-04-17T16:31:27Z","device_id":"dc67ce8d-f9a4-4ed7-8a30-40770113b121","exception_type":"sensor_offline","id":"37b8629e-0b1b-481d-b61b-74080a4d5957","status":"open"}],"total":1}
+    exceptions_api_test.go:77:   → POST /api/exceptions/:id/acknowledge
+    exceptions_api_test.go:77:   ← 200 {"acknowledged_at":"2026-04-17T16:31:27Z","acknowledged_by":"22222222-2222-2222-2222-222222222222","created_at":"2026-04-17T16:31:27Z","device_id":"dc67ce8d-f9a4-4ed7-8a30-40770113b121","exception_type":"sensor_offline","id":"37b8629e-0b1b-481d-b61b-74080a4d5957","note":"checked sensor","status":"acknowledged"}
+    exceptions_api_test.go:83:   → GET /api/exceptions
+    exceptions_api_test.go:83:   ← 200 {"items":[],"total":0}
+    exceptions_api_test.go:89:   → GET /api/exceptions/history
+    exceptions_api_test.go:89:   ← 200 {"items":[{"acknowledged_at":"2026-04-17T16:31:27Z","acknowledged_by":"22222222-2222-2222-2222-222222222222","created_at":"2026-04-17T16:31:27Z","device_id":"dc67ce8d-f9a4-4ed7-8a30-40770113b121","exception_type":"sensor_offline","id":"37b8629e-0b1b-481d-b61b-74080a4d5957","note":"checked sensor","status":"acknowledged"}],"page":1,"total":1}
+--- PASS: TestAcknowledgeExceptionAsDispatchAndHistory (1.56s)
+=== RUN   TestAcknowledgeExceptionWrongRoleForbiddenAndAuditLogged
+    exceptions_api_test.go:97:   → POST /api/auth/login
+    exceptions_api_test.go:97:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:28Z"}
+    exceptions_api_test.go:98:   → POST /api/auth/login
+    exceptions_api_test.go:98:   ← 200 {"id":"44444444-4444-4444-4444-444444444444","username":"auditor","display_name":"Auditor","status":"active","roles":["auditor"],"force_password_change":false,"created_at":"2026-04-17T16:31:28Z"}
+    exceptions_api_test.go:99:   → POST /api/facilities
+    exceptions_api_test.go:99:   ← 201 {"id":"f55c9006-d930-4617-9f57-c98384f5efd8"}
+    exceptions_api_test.go:99:   → POST /api/lots
+    exceptions_api_test.go:99:   ← 201 {"id":"031e3605-8881-4c71-a7c2-c0990e3e4d97"}
+    exceptions_api_test.go:99:   → POST /api/zones
+    exceptions_api_test.go:99:   ← 201 {"id":"d03e9e2c-7dec-41db-ac96-b8d68ba3c6cd"}
+    exceptions_api_test.go:99:   → POST /api/members
+    exceptions_api_test.go:99:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:28Z","display_name":"Member Res","id":"451df127-06b0-4630-97a9-79e080ebe2f3","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    exceptions_api_test.go:99:   → POST /api/vehicles
+    exceptions_api_test.go:99:   ← 201 {"id":"25364409-2fd2-4e74-afd4-5defa41a9410"}
+    exceptions_api_test.go:99:   → POST /api/devices
+    exceptions_api_test.go:99:   ← 201 {"id":"c922e85f-a4b4-449b-8ecc-48c3d5d21a52"}
+    exceptions_api_test.go:99:   → POST /api/device-events
+    exceptions_api_test.go:99:   ← 201 {"id":"07255439-74c0-45a0-884e-bd248637daf9","late":false,"reordered":false}
+    exceptions_api_test.go:99:   → GET /api/exceptions
+    exceptions_api_test.go:99:   ← 200 {"items":[{"created_at":"2026-04-17T16:31:28Z","device_id":"c922e85f-a4b4-449b-8ecc-48c3d5d21a52","exception_type":"camera_error","id":"668fbc04-d432-4701-8dfa-fdb19511896b","status":"open"}],"total":1}
+    exceptions_api_test.go:102:   → POST /api/exceptions/:id/acknowledge
+    exceptions_api_test.go:102:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+    exceptions_api_test.go:108:   → GET /api/admin/audit-logs
+    exceptions_api_test.go:108:   ← 200 {"items":[{"id":"5c57bdd2-6deb-4b4f-8f9b-a6bfeeff94d3","actor_id":"11111111-1111-1111-1111-111111111111","action":"rbac_denied","resource_type":"route","resource_id":null,"detail":{"method":"POST","path":"/api/exceptions/668fbc04-d432-4701-8dfa-fdb19511896b/acknowledge","required_roles":["dispatch_operator"],"user_roles":["facility_admin"]},"created_at":"2026-04-17T16:31:28Z"}],"limit":20,"page":1,"total":1}
+--- PASS: TestAcknowledgeExceptionWrongRoleForbiddenAndAuditLogged (1.58s)
+=== RUN   TestMasterDataCRUDHappyPathAndWrongRole
+    master_data_api_test.go:12:   → POST /api/auth/login
+    master_data_api_test.go:12:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:29Z"}
+    master_data_api_test.go:13:   → POST /api/auth/login
+    master_data_api_test.go:13:   ← 200 {"id":"22222222-2222-2222-2222-222222222222","username":"operator","display_name":"Operator","status":"active","roles":["dispatch_operator"],"force_password_change":false,"created_at":"2026-04-17T16:31:29Z"}
+    master_data_api_test.go:16:   → POST /api/facilities
+    master_data_api_test.go:16:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+    master_data_api_test.go:22:   → POST /api/facilities
+    master_data_api_test.go:22:   ← 201 {"id":"32a7545b-8e68-4158-a1c9-53afa8ee17b0"}
+    master_data_api_test.go:29:   → POST /api/lots
+    master_data_api_test.go:29:   ← 201 {"id":"3c47b92c-39e4-4b13-9d65-782d9ac6307f"}
+    master_data_api_test.go:36:   → POST /api/zones
+    master_data_api_test.go:36:   ← 201 {"id":"ecc6cf2a-3a58-41c4-9284-675f613a1db0"}
+    master_data_api_test.go:43:   → POST /api/rate-plans
+    master_data_api_test.go:43:   ← 201 {"id":"5ed79a81-5844-4520-99c0-ff78f31f8d1c"}
+    master_data_api_test.go:49:   → GET /api/zones
+    master_data_api_test.go:49:   ← 200 [{"hold_timeout_minutes":15,"id":"ecc6cf2a-3a58-41c4-9284-675f613a1db0","lot_id":"3c47b92c-39e4-4b13-9d65-782d9ac6307f","name":"Z1","total_stalls":50}]
+--- PASS: TestMasterDataCRUDHappyPathAndWrongRole (1.67s)
+=== RUN   TestMembersVehiclesDriversMessageRulesAndOrgScope
+    master_data_api_test.go:57:   → POST /api/auth/login
+    master_data_api_test.go:57:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:31Z"}
+    master_data_api_test.go:58:   → POST /api/auth/login
+    master_data_api_test.go:58:   ← 200 {"id":"33333333-3333-3333-3333-333333333333","username":"fleet","display_name":"Fleet","status":"active","roles":["fleet_manager"],"force_password_change":false,"created_at":"2026-04-17T16:31:31Z"}
+    master_data_api_test.go:61:   → POST /api/members
+    master_data_api_test.go:61:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:31Z","display_name":"OrgA Member","id":"aad0de83-c176-493b-8ec9-8e2e9d11b633","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    master_data_api_test.go:68:   → GET /api/members
+    master_data_api_test.go:68:   ← 200 {"items":[{"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:31Z","display_name":"OrgA Member","id":"aad0de83-c176-493b-8ec9-8e2e9d11b633","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}],"total":1}
+    master_data_api_test.go:74:   → GET /api/members/:id
+    master_data_api_test.go:74:   ← 200 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:31Z","display_name":"OrgA Member","id":"aad0de83-c176-493b-8ec9-8e2e9d11b633","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    master_data_api_test.go:80:   → PATCH /api/members/:id
+    master_data_api_test.go:80:   ← 200 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:31Z","display_name":"OrgA Member Updated","id":"aad0de83-c176-493b-8ec9-8e2e9d11b633","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    master_data_api_test.go:86:   → POST /api/vehicles
+    master_data_api_test.go:86:   ← 201 {"id":"2115a268-0414-4747-b97b-7d3ae02d47a7"}
+    master_data_api_test.go:93:   → GET /api/vehicles
+    master_data_api_test.go:93:   ← 200 [{"id":"2115a268-0414-4747-b97b-7d3ae02d47a7","make":"Ford","model":"Focus","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa","plate_number":"ABC123"}]
+    master_data_api_test.go:99:   → GET /api/vehicles/:id
+    master_data_api_test.go:99:   ← 200 {"id":"2115a268-0414-4747-b97b-7d3ae02d47a7","make":"Ford","model":"Focus","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa","plate_number":"ABC123"}
+    master_data_api_test.go:105:   → PATCH /api/vehicles/:id
+    master_data_api_test.go:105:   ← 200 {"message":"updated"}
+    master_data_api_test.go:111:   → POST /api/drivers
+    master_data_api_test.go:111:   ← 201 {"id":"04256252-7fd6-44f3-84cc-b000c32057f3"}
+    master_data_api_test.go:118:   → GET /api/drivers
+    master_data_api_test.go:118:   ← 200 [{"id":"04256252-7fd6-44f3-84cc-b000c32057f3","licence_number":"LIC-1","member_id":[170,208,222,131,193,118,73,59,142,201,142,46,157,17,182,51],"organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}]
+    master_data_api_test.go:124:   → GET /api/drivers/:id
+    master_data_api_test.go:124:   ← 200 {"id":"04256252-7fd6-44f3-84cc-b000c32057f3","licence_number":"LIC-1","member_id":[170,208,222,131,193,118,73,59,142,201,142,46,157,17,182,51],"organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    master_data_api_test.go:130:   → PATCH /api/drivers/:id
+    master_data_api_test.go:130:   ← 200 {"message":"updated"}
+    master_data_api_test.go:136:   → POST /api/message-rules
+    master_data_api_test.go:136:   ← 201 {"id":"64fcb0db-0a3c-4e40-b6e4-cab66425b8c4"}
+    master_data_api_test.go:142:   → GET /api/members/:id/balance
+    master_data_api_test.go:142:   ← 200 {"arrears_balance_cents":0}
+    master_data_api_test.go:148:   → PATCH /api/members/:id/balance
+    master_data_api_test.go:148:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+    master_data_api_test.go:154:   → PATCH /api/members/:id/balance
+    master_data_api_test.go:154:   ← 200 {"arrears_balance_cents":100}
+    master_data_api_test.go:170:   → GET /api/members/:id
+    master_data_api_test.go:170:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+    master_data_api_test.go:176:   → GET /api/vehicles/:id
+    master_data_api_test.go:176:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+    master_data_api_test.go:191:   → DELETE /api/drivers/:id
+    master_data_api_test.go:191:   ← 204 
+    master_data_api_test.go:197:   → DELETE /api/vehicles/:id
+    master_data_api_test.go:197:   ← 204 
+    master_data_api_test.go:203:   → DELETE /api/members/:id
+    master_data_api_test.go:203:   ← 204 
+--- PASS: TestMembersVehiclesDriversMessageRulesAndOrgScope (1.61s)
+=== RUN   TestFacilityReadUpdateDelete
+    master_data_coverage_api_test.go:16:   → POST /api/auth/login
+    master_data_coverage_api_test.go:16:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:33Z"}
+    master_data_coverage_api_test.go:17:   → POST /api/auth/login
+    master_data_coverage_api_test.go:17:   ← 200 {"id":"22222222-2222-2222-2222-222222222222","username":"operator","display_name":"Operator","status":"active","roles":["dispatch_operator"],"force_password_change":false,"created_at":"2026-04-17T16:31:33Z"}
+    master_data_coverage_api_test.go:28:   → GET /api/facilities
+    master_data_coverage_api_test.go:28:   ← 200 [{"address":"100 Main","created_at":"2026-04-17T16:31:33Z","id":"25e91d8d-f3ee-4480-9ba0-ca6ef9b45c74","name":"F-Cov"}]
+    master_data_coverage_api_test.go:38:   → GET /api/facilities/:id
+    master_data_coverage_api_test.go:38:   ← 200 {"address":"100 Main","created_at":"2026-04-17T19:31:33.696989+03:00","id":"25e91d8d-f3ee-4480-9ba0-ca6ef9b45c74","name":"F-Cov"}
+    master_data_coverage_api_test.go:45:   → PATCH /api/facilities/:id
+    master_data_coverage_api_test.go:45:   ← 200 {"message":"updated"}
+    master_data_coverage_api_test.go:68:   → DELETE /api/facilities/:id
+    master_data_coverage_api_test.go:68:   ← 204 
+--- PASS: TestFacilityReadUpdateDelete (1.67s)
+=== RUN   TestLotReadUpdateDelete
+    master_data_coverage_api_test.go:80:   → POST /api/auth/login
+    master_data_coverage_api_test.go:80:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:34Z"}
+    master_data_coverage_api_test.go:96:   → GET /api/lots
+    master_data_coverage_api_test.go:96:   ← 200 [{"facility_id":"231158fe-b8c0-493a-8dc2-71a708bfe63b","id":"658e9a23-b799-4350-9262-1ff0a6874d38","name":"L-Cov"}]
+    master_data_coverage_api_test.go:109:   → GET /api/lots/:id
+    master_data_coverage_api_test.go:109:   ← 200 {"facility_id":[35,17,88,254,184,192,73,58,141,194,113,167,8,191,230,59],"id":"658e9a23-b799-4350-9262-1ff0a6874d38","name":"L-Cov"}
+    master_data_coverage_api_test.go:116:   → PATCH /api/lots/:id
+    master_data_coverage_api_test.go:116:   ← 200 {"message":"updated"}
+    master_data_coverage_api_test.go:123:   → DELETE /api/lots/:id
+    master_data_coverage_api_test.go:123:   ← 204 
+--- PASS: TestLotReadUpdateDelete (1.25s)
+=== RUN   TestZoneReadDelete
+    master_data_coverage_api_test.go:131:   → POST /api/auth/login
+    master_data_coverage_api_test.go:131:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:35Z"}
+    master_data_coverage_api_test.go:145:   → GET /api/zones/:id
+    master_data_coverage_api_test.go:145:   ← 200 {"hold_timeout_minutes":15,"id":"fb0db4a4-24de-4d85-b9fc-c61f2334839e","lot_id":[153,169,114,228,174,6,71,65,138,114,124,166,248,220,107,40],"name":"Z-Cov","total_stalls":20}
+    master_data_coverage_api_test.go:155:   → DELETE /api/zones/:id
+    master_data_coverage_api_test.go:155:   ← 204 
+--- PASS: TestZoneReadDelete (1.27s)
+=== RUN   TestRatePlanReadUpdateDelete
+    master_data_coverage_api_test.go:168:   → POST /api/auth/login
+    master_data_coverage_api_test.go:168:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:37Z"}
+    master_data_coverage_api_test.go:184:   → GET /api/rate-plans
+    master_data_coverage_api_test.go:184:   ← 200 [{"id":"fb981b18-8b9d-49af-8537-54411fc8c2f6","name":"Hourly","period":"hourly","rate_cents":500,"zone_id":"340e61d2-5f71-4ccb-a29f-434a4894f1f2"}]
+    master_data_coverage_api_test.go:197:   → GET /api/rate-plans/:id
+    master_data_coverage_api_test.go:197:   ← 200 {"id":"fb981b18-8b9d-49af-8537-54411fc8c2f6","name":"Hourly","period":"hourly","rate_cents":500,"zone_id":[52,14,97,210,95,113,76,203,162,159,67,74,72,148,241,242]}
+    master_data_coverage_api_test.go:204:   → PATCH /api/rate-plans/:id
+    master_data_coverage_api_test.go:204:   ← 200 {"message":"updated"}
+    master_data_coverage_api_test.go:215:   → DELETE /api/rate-plans/:id
+    master_data_coverage_api_test.go:215:   ← 204 
+--- PASS: TestRatePlanReadUpdateDelete (1.36s)
+=== RUN   TestMessageRuleReadUpdateDelete
+    master_data_coverage_api_test.go:223:   → POST /api/auth/login
+    master_data_coverage_api_test.go:223:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:38Z"}
+    master_data_coverage_api_test.go:245:   → GET /api/message-rules
+    master_data_coverage_api_test.go:245:   ← 200 [{"active":true,"id":"f186e4de-b2df-4ec8-a44c-72083f34f9ea","template":"Hello {{.member}}","topic_id":"3cd8e1be-c193-4157-b8b1-252d045776d0","trigger_event":"booking.confirmed"}]
+    master_data_coverage_api_test.go:256:   → PATCH /api/message-rules/:id
+    master_data_coverage_api_test.go:256:   ← 200 {"message":"updated"}
+    master_data_coverage_api_test.go:267:   → DELETE /api/message-rules/:id
+    master_data_coverage_api_test.go:267:   ← 204 
+--- PASS: TestMessageRuleReadUpdateDelete (1.19s)
+=== RUN   TestHealthEndpoint
+    misc_coverage_api_test.go:18:   → GET /api/health
+    misc_coverage_api_test.go:18:   ← 200 {"status":"ok"}
+--- PASS: TestHealthEndpoint (1.03s)
+=== RUN   TestCampaignsList
+    misc_coverage_api_test.go:29:   → POST /api/auth/login
+    misc_coverage_api_test.go:29:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:40Z"}
+    misc_coverage_api_test.go:45:   → GET /api/campaigns
+    misc_coverage_api_test.go:45:   ← 200 [{"created_at":"2026-04-17T16:31:41Z","created_by":"11111111-1111-1111-1111-111111111111","description":"b","id":"b6355af7-1eca-4084-86da-086b7675d42b","target_role":"dispatch_operator","title":"Campaign Bravo","updated_at":"2026-04-17T16:31:41Z"},{"created_at":"2026-04-17T16:31:41Z","created_by":"11111111-1111-1111-1111-111111111111","description":"a","id":"5a888674-0826-4033-9439-55a1cb78aa78","title":"Campaign Alpha","updated_at":"2026-04-17T16:31:41Z"}]
+    misc_coverage_api_test.go:62:   → POST /api/auth/login
+    misc_coverage_api_test.go:62:   ← 200 {"id":"44444444-4444-4444-4444-444444444444","username":"auditor","display_name":"Auditor","status":"active","roles":["auditor"],"force_password_change":false,"created_at":"2026-04-17T16:31:40Z"}
+--- PASS: TestCampaignsList (1.60s)
+=== RUN   TestReservationStatsToday
+    misc_coverage_api_test.go:71:   → POST /api/auth/login
+    misc_coverage_api_test.go:71:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:42Z"}
+    misc_coverage_api_test.go:75:   → GET /api/reservations/stats/today (baseline)
+    misc_coverage_api_test.go:75:   ← 200 {"total_reservations_today":0}
+    misc_coverage_api_test.go:84:   → POST /api/facilities
+    misc_coverage_api_test.go:84:   ← 201 {"id":"17859d74-f5cd-4e6a-80d6-cb5926508a8a"}
+    misc_coverage_api_test.go:84:   → POST /api/lots
+    misc_coverage_api_test.go:84:   ← 201 {"id":"ef64c4e5-e721-4eaa-8e72-430f59e55a12"}
+    misc_coverage_api_test.go:84:   → POST /api/zones
+    misc_coverage_api_test.go:84:   ← 201 {"id":"22cb2bf4-f38c-4770-aa0e-fdec8cf53200"}
+    misc_coverage_api_test.go:84:   → POST /api/members
+    misc_coverage_api_test.go:84:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:42Z","display_name":"Member Res","id":"9360750e-7520-4361-8ffe-3ce35012ba65","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    misc_coverage_api_test.go:84:   → POST /api/vehicles
+    misc_coverage_api_test.go:84:   ← 201 {"id":"1f3f0811-3302-49d4-8b85-96f2ed6611fc"}
+    misc_coverage_api_test.go:100:   → GET /api/reservations/stats/today (after hold)
+    misc_coverage_api_test.go:100:   ← 200 {"total_reservations_today":1}
+--- PASS: TestReservationStatsToday (1.48s)
+=== RUN   TestNotificationSubscribeListReadDismissAndExport
+    notifications_api_test.go:64:   → POST /api/auth/login
+    notifications_api_test.go:64:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:43Z"}
+    notifications_api_test.go:67:   → GET /api/notification-topics
+    notifications_api_test.go:67:   ← 200 [{"id":"aee7a1c2-711e-4240-9bb3-8887cf919967","name":"arrears_reminder","subscribed":false},{"id":"8af6a010-d951-4c9a-ad92-83fced591a5f","name":"booking_changed","subscribed":false},{"id":"3bf560b9-444b-46e6-862b-cdd389d677bb","name":"booking_success","subscribed":false},{"id":"1c282891-0f24-4259-95a4-b60d6d68357b","name":"expiry_approaching","subscribed":false},{"id":"9bd0d777-2fed-4321-b370-e5176e7aaf1a","name":"task_reminder","subscribed":false}]
+    notifications_api_test.go:74:   → POST /api/notification-topics/:id/subscribe
+    notifications_api_test.go:74:   ← 200 {"message":"subscribed"}
+    notifications_api_test.go:79:   → POST /api/facilities
+    notifications_api_test.go:79:   ← 201 {"id":"2fb48939-726b-4222-b06f-df98e7f11988"}
+    notifications_api_test.go:79:   → POST /api/lots
+    notifications_api_test.go:79:   ← 201 {"id":"4f2fec79-c04b-42b7-919f-c3bc6d187f38"}
+    notifications_api_test.go:79:   → POST /api/zones
+    notifications_api_test.go:79:   ← 201 {"id":"e63b7d6d-6272-4c80-9451-0c04275d9572"}
+    notifications_api_test.go:79:   → POST /api/members
+    notifications_api_test.go:79:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:44Z","display_name":"Member Res","id":"7950c863-bf9d-4b5a-bee4-0f39a7581b57","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    notifications_api_test.go:79:   → POST /api/vehicles
+    notifications_api_test.go:79:   ← 201 {"id":"7bb71abc-b882-4a7c-aa82-c06699c18ce8"}
+    notifications_api_test.go:88:   → POST /api/reservations/hold
+    notifications_api_test.go:88:   ← 201 {"available_stalls":1,"hold_expires_at":"2026-04-17T16:46:44Z","id":"369f19a0-943b-46d4-8e1b-9dc46afdbc43","status":"hold","time_window_end":"2026-04-17T18:31:44Z","time_window_start":"2026-04-17T17:31:44Z"}
+    notifications_api_test.go:95:   → POST /api/reservations/:id/confirm
+    notifications_api_test.go:95:   ← 200 {"confirmed_at":"2026-04-17T16:31:44Z","id":"369f19a0-943b-46d4-8e1b-9dc46afdbc43","status":"confirmed"}
+    notifications_api_test.go:101:   → GET /api/notifications
+    notifications_api_test.go:101:   ← 200 {"items":[{"body":"Your booking has been confirmed.","created_at":"2026-04-17T16:31:44Z","dismissed":false,"id":"37ebdfa6-2cb7-44c7-9829-3741fbb344db","read":false,"title":"Booking confirmed"}],"page":1,"total":1}
+    notifications_api_test.go:108:   → GET /api/notifications/:id
+    notifications_api_test.go:108:   ← 200 {"body":"Your booking has been confirmed.","created_at":"2026-04-17T16:31:44Z","dismissed":false,"id":"37ebdfa6-2cb7-44c7-9829-3741fbb344db","read":false,"title":"Booking confirmed"}
+    notifications_api_test.go:114:   → PATCH /api/notifications/:id/read
+    notifications_api_test.go:114:   ← 200 {"message":"read"}
+    notifications_api_test.go:120:   → POST /api/notifications/:id/dismiss
+    notifications_api_test.go:120:   ← 200 {"message":"dismissed"}
+    notifications_api_test.go:126:   → GET /api/notifications/export-packages
+    notifications_api_test.go:126:   ← 200 [{"channel":"in_app","created_at":"2026-04-17T16:31:44Z","id":"5918ead7-ae09-44bf-9172-6c789a717d8a","recipient":"11111111-1111-1111-1111-111111111111"}]
+    notifications_api_test.go:133:   → GET /api/notifications/export-packages/:id/download
+    notifications_api_test.go:133:   ← 200 {"body":"Your booking has been confirmed.","channel":"in_app","created_at":"2026-04-17T16:31:44Z","delivered_at":"2026-04-17T16:31:44Z","id":"5918ead7-ae09-44bf-9172-6c789a717d8a","payload":{"booking_id":"369f19a0-943b-46d4-8e1b-9dc46afdbc43","recipient":"11111111-1111-1111-1111-111111111111","trigger_event":"booking.confirmed"},"recipient":"11111111-1111-1111-1111-111111111111","status":"delivered","title":"Booking confirmed"}
+--- PASS: TestNotificationSubscribeListReadDismissAndExport (1.47s)
+=== RUN   TestNotificationDNDSettings
+    notifications_api_test.go:141:   → POST /api/auth/login
+    notifications_api_test.go:141:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:45Z"}
+    notifications_api_test.go:148:   → PATCH /api/notification-settings/dnd
+    notifications_api_test.go:148:   ← 200 {"enabled":true,"end_time":"06:00","start_time":"22:00"}
+    notifications_api_test.go:154:   → GET /api/notification-settings/dnd
+    notifications_api_test.go:154:   ← 200 {"dnd":{"enabled":true,"end_time":"06:00","start_time":"22:00"}}
+--- PASS: TestNotificationDNDSettings (1.35s)
+=== RUN   TestNotificationFrequencyCapAndPersistence
+    notifications_api_test.go:162:   → POST /api/auth/login
+    notifications_api_test.go:162:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:46Z"}
+    notifications_api_test.go:164:   → GET /api/notification-topics
+    notifications_api_test.go:164:   ← 200 [{"id":"979e7369-f452-4306-ba65-0781d5d1a517","name":"arrears_reminder","subscribed":false},{"id":"b1706d4b-f080-4db5-bd55-5df54a19a763","name":"booking_changed","subscribed":false},{"id":"ec80f166-6c99-48be-ab5b-87ce6f35e9e2","name":"booking_success","subscribed":false},{"id":"9708635c-3548-4e45-a67b-9803f01012de","name":"expiry_approaching","subscribed":false},{"id":"9fc13ed6-ebcf-42b8-a5ee-3003f85e273e","name":"task_reminder","subscribed":false}]
+    notifications_api_test.go:167:   → POST /api/notification-topics/:id/subscribe
+    notifications_api_test.go:167:   ← 200 {"message":"subscribed"}
+    notifications_api_test.go:169:   → POST /api/facilities
+    notifications_api_test.go:169:   ← 201 {"id":"f1e478ac-b324-42ed-91ee-c06c8624078f"}
+    notifications_api_test.go:169:   → POST /api/lots
+    notifications_api_test.go:169:   ← 201 {"id":"1475d894-5c74-4f54-b62c-297cb2ce6cc9"}
+    notifications_api_test.go:169:   → POST /api/zones
+    notifications_api_test.go:169:   ← 201 {"id":"04eef687-11f0-4e7b-bb2e-47648c2630a1"}
+    notifications_api_test.go:169:   → POST /api/members
+    notifications_api_test.go:169:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:31:47Z","display_name":"Member Res","id":"cde91feb-6e4b-40ed-9695-73e47927f650","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    notifications_api_test.go:169:   → POST /api/vehicles
+    notifications_api_test.go:169:   ← 201 {"id":"25ea6fe7-1e2f-4fc9-87bb-12d0bc1a3a05"}
+    notifications_api_test.go:199:   → POST /api/reservations/hold
+    notifications_api_test.go:199:   ← 201 {"available_stalls":1,"hold_expires_at":"2026-04-17T16:46:47Z","id":"96a517a3-6dc4-410f-8a46-a43dd01fec69","status":"hold","time_window_end":"2026-04-17T20:31:47Z","time_window_start":"2026-04-17T19:31:47Z"}
+    notifications_api_test.go:202:   → POST /api/reservations/:id/confirm
+    notifications_api_test.go:202:   ← 200 {"confirmed_at":"2026-04-17T16:31:47Z","id":"96a517a3-6dc4-410f-8a46-a43dd01fec69","status":"confirmed"}
+--- PASS: TestNotificationFrequencyCapAndPersistence (1.35s)
+=== RUN   TestNotificationSettingsGenericGetAndPatch
+    notifications_coverage_api_test.go:14:   → POST /api/auth/login
+    notifications_coverage_api_test.go:14:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:48Z"}
+    notifications_coverage_api_test.go:18:   → GET /api/notification-settings
+    notifications_coverage_api_test.go:18:   ← 200 {"dnd":{"enabled":false,"end_time":"06:00","start_time":"22:00"}}
+    notifications_coverage_api_test.go:34:   → PATCH /api/notification-settings
+    notifications_coverage_api_test.go:34:   ← 200 {"enabled":true,"end_time":"06:30","start_time":"21:00"}
+--- PASS: TestNotificationSettingsGenericGetAndPatch (1.28s)
+=== RUN   TestNotificationTopicUnsubscribe
+    notifications_coverage_api_test.go:57:   → POST /api/auth/login
+    notifications_coverage_api_test.go:57:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:49Z"}
+    notifications_coverage_api_test.go:79:   → DELETE /api/notification-topics/:id/subscribe
+    notifications_coverage_api_test.go:79:   ← 200 {"message":"unsubscribed"}
+--- PASS: TestNotificationTopicUnsubscribe (1.54s)
+=== RUN   TestDispatchRoleForbiddenEndpointsAndAuditLog
+    rbac_api_test.go:26:   → POST /api/auth/login
+    rbac_api_test.go:26:   ← 200 {"id":"22222222-2222-2222-2222-222222222222","username":"operator","display_name":"Operator","status":"active","roles":["dispatch_operator"],"force_password_change":false,"created_at":"2026-04-17T16:31:51Z"}
+    rbac_api_test.go:40:   → GET /api/admin/users
+    rbac_api_test.go:40:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+    rbac_api_test.go:40:   → POST /api/admin/users
+    rbac_api_test.go:40:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+    rbac_api_test.go:40:   → DELETE /api/admin/users/22222222-2222-2222-2222-222222222222
+    rbac_api_test.go:40:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+--- PASS: TestDispatchRoleForbiddenEndpointsAndAuditLog (1.62s)
+=== RUN   TestFleetRoleForbiddenEndpointsAndAuditLog
+    rbac_api_test.go:51:   → POST /api/auth/login
+    rbac_api_test.go:51:   ← 200 {"id":"33333333-3333-3333-3333-333333333333","username":"fleet","display_name":"Fleet","status":"active","roles":["fleet_manager"],"force_password_change":false,"created_at":"2026-04-17T16:31:52Z"}
+    rbac_api_test.go:65:   → PATCH /api/admin/users/22222222-2222-2222-2222-222222222222/roles
+    rbac_api_test.go:65:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+    rbac_api_test.go:65:   → POST /api/admin/users/22222222-2222-2222-2222-222222222222/unlock
+    rbac_api_test.go:65:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+    rbac_api_test.go:65:   → GET /api/admin/audit-logs
+    rbac_api_test.go:65:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+--- PASS: TestFleetRoleForbiddenEndpointsAndAuditLog (1.54s)
+=== RUN   TestAuditorRoleAccessAndForbiddenEndpoints
+    rbac_api_test.go:76:   → POST /api/auth/login
+    rbac_api_test.go:76:   ← 200 {"id":"44444444-4444-4444-4444-444444444444","username":"auditor","display_name":"Auditor","status":"active","roles":["auditor"],"force_password_change":false,"created_at":"2026-04-17T16:31:54Z"}
+    rbac_api_test.go:79:   → GET /api/admin/audit-logs
+    rbac_api_test.go:79:   ← 200 {"items":[],"limit":20,"page":1,"total":0}
+    rbac_api_test.go:96:   → GET /api/admin/users
+    rbac_api_test.go:96:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+    rbac_api_test.go:96:   → PATCH /api/admin/users/22222222-2222-2222-2222-222222222222
+    rbac_api_test.go:96:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+    rbac_api_test.go:96:   → DELETE /api/admin/users/22222222-2222-2222-2222-222222222222
+    rbac_api_test.go:96:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+--- PASS: TestAuditorRoleAccessAndForbiddenEndpoints (1.30s)
+=== RUN   TestAdminCanManageUsersAndUpdateRoles
+    rbac_api_test.go:107:   → POST /api/auth/login
+    rbac_api_test.go:107:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:55Z"}
+    rbac_api_test.go:115:   → POST /api/admin/users
+    rbac_api_test.go:115:   ← 201 {"id":"efdc4f5e-9a05-48d4-9094-440ef01b9bb9","username":"newuser","display_name":"New User","status":"active","roles":["dispatch_operator"],"force_password_change":false,"created_at":"2026-04-17T16:31:55Z"}
+    rbac_api_test.go:121:   → GET /api/admin/users?page=1&limit=10
+    rbac_api_test.go:121:   ← 200 {"items":[{"id":"efdc4f5e-9a05-48d4-9094-440ef01b9bb9","username":"newuser","display_name":"New User","status":"active","roles":["dispatch_operator"],"force_password_change":false,"created_at":"2026-04-17T16:31:55Z"},{"id":"22222222-2222-2222-2222-222222222222","username":"operator","display_name":"Operator","status":"active","roles":["dispatch_operator"],"force_password_change":false,"created_at":"2026-04-17T16:31:55Z"},{"id":"33333333-3333-3333-3333-333333333333","username":"fleet","display_name":"Fleet","status":"active","roles":["fleet_manager"],"force_password_change":false,"created_at":"2026-04-17T16:31:55Z"},{"id":"44444444-4444-4444-4444-444444444444","username":"auditor","display_name":"Auditor","status":"active","roles":["auditor"],"force_password_change":false,"created_at":"2026-04-17T16:31:55Z"},{"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:55Z"}],"total":5,"page":1,"limit":10}
+    rbac_api_test.go:135:   → PATCH /api/admin/users/:id
+    rbac_api_test.go:135:   ← 200 {"id":"efdc4f5e-9a05-48d4-9094-440ef01b9bb9","username":"newuser","display_name":"Renamed User","status":"active","roles":["dispatch_operator"],"force_password_change":false,"created_at":"2026-04-17T16:31:55Z"}
+    rbac_api_test.go:143:   → PATCH /api/admin/users/:id/roles
+    rbac_api_test.go:143:   ← 200 {"id":"efdc4f5e-9a05-48d4-9094-440ef01b9bb9","username":"newuser","display_name":"Renamed User","status":"active","roles":["auditor","fleet_manager"],"force_password_change":false,"created_at":"2026-04-17T16:31:55Z"}
+    rbac_api_test.go:149:   → DELETE /api/admin/users/:id
+    rbac_api_test.go:149:   ← 204 
+--- PASS: TestAdminCanManageUsersAndUpdateRoles (1.54s)
+=== RUN   TestAdminCanAccessAuditLogs
+    rbac_api_test.go:173:   → POST /api/auth/login
+    rbac_api_test.go:173:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:31:57Z"}
+    rbac_api_test.go:176:   → GET /api/admin/audit-logs
+    rbac_api_test.go:176:   ← 200 {"items":[],"limit":20,"page":1,"total":0}
+--- PASS: TestAdminCanAccessAuditLogs (1.57s)
+=== RUN   TestFleetForbiddenFromAuditLogs
+    rbac_api_test.go:184:   → POST /api/auth/login
+    rbac_api_test.go:184:   ← 200 {"id":"33333333-3333-3333-3333-333333333333","username":"fleet","display_name":"Fleet","status":"active","roles":["fleet_manager"],"force_password_change":false,"created_at":"2026-04-17T16:31:58Z"}
+    rbac_api_test.go:187:   → GET /api/admin/audit-logs (fleet)
+    rbac_api_test.go:187:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+--- PASS: TestFleetForbiddenFromAuditLogs (1.39s)
+=== RUN   TestRoleEndpointRejectsUnauthorizedRoleUpdate
+    rbac_api_test.go:195:   → POST /api/auth/login
+    rbac_api_test.go:195:   ← 200 {"id":"22222222-2222-2222-2222-222222222222","username":"operator","display_name":"Operator","status":"active","roles":["dispatch_operator"],"force_password_change":false,"created_at":"2026-04-17T16:31:59Z"}
+    rbac_api_test.go:200:   → PATCH /api/admin/users/:id/roles
+    rbac_api_test.go:200:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+--- PASS: TestRoleEndpointRejectsUnauthorizedRoleUpdate (1.31s)
+=== RUN   TestDeleteUserEndpointForbiddenForDispatch
+    rbac_api_test.go:208:   → POST /api/auth/login
+    rbac_api_test.go:208:   ← 200 {"id":"22222222-2222-2222-2222-222222222222","username":"operator","display_name":"Operator","status":"active","roles":["dispatch_operator"],"force_password_change":false,"created_at":"2026-04-17T16:32:01Z"}
+    rbac_api_test.go:212:   → DELETE /api/admin/users/:id
+    rbac_api_test.go:212:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+--- PASS: TestDeleteUserEndpointForbiddenForDispatch (1.35s)
+=== RUN   TestManualReconciliationRunCreatesCompensatingEventsAndAuditLog
+    reconciliation_api_test.go:13:   → POST /api/auth/login
+    reconciliation_api_test.go:13:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:02Z"}
+    reconciliation_api_test.go:14:   → POST /api/facilities
+    reconciliation_api_test.go:14:   ← 201 {"id":"71fe0453-952f-47d0-a64d-5191b5187e1b"}
+    reconciliation_api_test.go:14:   → POST /api/lots
+    reconciliation_api_test.go:14:   ← 201 {"id":"7ad7ab44-a9ea-4d38-b5cc-3d4dadeb5d3e"}
+    reconciliation_api_test.go:14:   → POST /api/zones
+    reconciliation_api_test.go:14:   ← 201 {"id":"dd905e5d-065b-416f-8805-2884b85400ad"}
+    reconciliation_api_test.go:14:   → POST /api/members
+    reconciliation_api_test.go:14:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:32:03Z","display_name":"Member Res","id":"d743d30f-8c5d-4b35-a7f4-bd370798a1cd","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    reconciliation_api_test.go:14:   → POST /api/vehicles
+    reconciliation_api_test.go:14:   ← 201 {"id":"c90ca4f9-a2b3-4c8c-bffd-0a13bce39930"}
+    reconciliation_api_test.go:49:   → POST /api/reconciliation/run
+    reconciliation_api_test.go:49:   ← 200 {"discrepancies_found":1,"run_id":"4e24bb8c-d789-45d5-8020-656fbed60889","zones_checked":1}
+    reconciliation_api_test.go:69:   → POST /api/auth/login
+    reconciliation_api_test.go:69:   ← 200 {"id":"44444444-4444-4444-4444-444444444444","username":"auditor","display_name":"Auditor","status":"active","roles":["auditor"],"force_password_change":false,"created_at":"2026-04-17T16:32:02Z"}
+    reconciliation_api_test.go:71:   → GET /api/admin/audit-logs
+    reconciliation_api_test.go:71:   ← 200 {"items":[{"id":"9485c485-f63a-412b-be0f-c64a65751525","actor_id":null,"action":"reconciliation.run","resource_type":"reconciliation_run","resource_id":"4e24bb8c-d789-45d5-8020-656fbed60889","detail":{"discrepancies_found":1,"zones_checked":1},"created_at":"2026-04-17T16:32:03Z"}],"limit":20,"page":1,"total":1}
+--- PASS: TestManualReconciliationRunCreatesCompensatingEventsAndAuditLog (1.95s)
+=== RUN   TestReservationFlowAndCapacityEndpoints
+    reservations_api_test.go:90:   → POST /api/auth/login
+    reservations_api_test.go:90:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:04Z"}
+    reservations_api_test.go:91:   → POST /api/facilities
+    reservations_api_test.go:91:   ← 201 {"id":"234a6ba2-6db1-4482-81e1-72e6b30cc0c6"}
+    reservations_api_test.go:91:   → POST /api/lots
+    reservations_api_test.go:91:   ← 201 {"id":"f4b1f9f9-a9a8-4f2e-b501-98877252e12b"}
+    reservations_api_test.go:91:   → POST /api/zones
+    reservations_api_test.go:91:   ← 201 {"id":"196e0755-3073-457c-8bcd-b0db42dd67f4"}
+    reservations_api_test.go:91:   → POST /api/members
+    reservations_api_test.go:91:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:32:04Z","display_name":"Member Res","id":"3487c96c-173b-4369-90a1-c6dedbd49b65","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    reservations_api_test.go:91:   → POST /api/vehicles
+    reservations_api_test.go:91:   ← 201 {"id":"472fe2e6-373d-4009-876f-0219afff2701"}
+    reservations_api_test.go:97:   → GET /api/availability
+    reservations_api_test.go:97:   ← 200 {"available_stalls":2,"confirmed_stalls":0,"held_stalls":0,"time_window_end":"2026-04-17T20:32:04Z","time_window_start":"2026-04-17T18:32:04Z","total_stalls":2,"zone_id":"196e0755-3073-457c-8bcd-b0db42dd67f4"}
+    reservations_api_test.go:110:   → POST /api/reservations/hold
+    reservations_api_test.go:110:   ← 201 {"available_stalls":1,"hold_expires_at":"2026-04-17T16:47:04Z","id":"750d8866-696a-44d0-b650-258fa67c3cab","status":"hold","time_window_end":"2026-04-17T20:32:04Z","time_window_start":"2026-04-17T18:32:04Z"}
+    reservations_api_test.go:117:   → GET /api/availability
+    reservations_api_test.go:117:   ← 200 {"available_stalls":1,"confirmed_stalls":0,"held_stalls":1,"time_window_end":"2026-04-17T20:32:04Z","time_window_start":"2026-04-17T18:32:04Z","total_stalls":2,"zone_id":"196e0755-3073-457c-8bcd-b0db42dd67f4"}
+    reservations_api_test.go:123:   → POST /api/reservations/:id/confirm
+    reservations_api_test.go:123:   ← 200 {"confirmed_at":"2026-04-17T16:32:04Z","id":"750d8866-696a-44d0-b650-258fa67c3cab","status":"confirmed"}
+    reservations_api_test.go:129:   → GET /api/reservations/:id/timeline
+    reservations_api_test.go:129:   ← 200 [{"actor_id":"11111111-1111-1111-1111-111111111111","detail":{"expires_at":"2026-04-17T16:47:04Z","stall_count":1},"event_type":"hold_created","occurred_at":"2026-04-17T16:32:04Z"},{"actor_id":"11111111-1111-1111-1111-111111111111","detail":{"stall_count":1},"event_type":"confirmed","occurred_at":"2026-04-17T16:32:04Z"},{"actor_id":"11111111-1111-1111-1111-111111111111","detail":{"reason":"confirmed"},"event_type":"hold_released","occurred_at":"2026-04-17T16:32:04Z"}]
+    reservations_api_test.go:135:   → POST /api/reservations/:id/cancel
+    reservations_api_test.go:135:   ← 200 {"cancelled_at":"2026-04-17T16:32:04Z","id":"750d8866-696a-44d0-b650-258fa67c3cab","status":"cancelled"}
+    reservations_api_test.go:141:   → GET /api/availability
+    reservations_api_test.go:141:   ← 200 {"available_stalls":2,"confirmed_stalls":0,"held_stalls":0,"time_window_end":"2026-04-17T20:32:04Z","time_window_start":"2026-04-17T18:32:04Z","total_stalls":2,"zone_id":"196e0755-3073-457c-8bcd-b0db42dd67f4"}
+    reservations_api_test.go:147:   → GET /api/capacity/dashboard
+    reservations_api_test.go:147:   ← 200 {"zones":[{"available_stalls":2,"confirmed_stalls":0,"held_stalls":0,"total_stalls":2,"zone_id":"196e0755-3073-457c-8bcd-b0db42dd67f4","zone_name":"Z-Res"}]}
+    reservations_api_test.go:153:   → GET /api/capacity/zones/:id/stalls
+    reservations_api_test.go:153:   ← 200 {"available_stalls":2,"confirmed_stalls":0,"held_stalls":0,"time_window_end":"2026-04-17T20:32:04Z","time_window_start":"2026-04-17T18:32:04Z","total_stalls":2,"zone_id":"196e0755-3073-457c-8bcd-b0db42dd67f4"}
+    reservations_api_test.go:159:   → GET /api/capacity/snapshots
+    reservations_api_test.go:159:   ← 200 [{"authoritative_stalls":2,"id":"ebb44cee-b234-4101-a69f-1333ef7cf594","snapshot_at":"2026-04-17T16:32:04Z","zone_id":"196e0755-3073-457c-8bcd-b0db42dd67f4"},{"authoritative_stalls":2,"id":"b5fae0fb-0bb8-4f8b-91d4-ee45524c1a27","snapshot_at":"2026-04-17T16:32:04Z","zone_id":"196e0755-3073-457c-8bcd-b0db42dd67f4"},{"authoritative_stalls":2,"id":"05fe2c03-c0d7-4087-b173-d773e1cc88a6","snapshot_at":"2026-04-17T16:32:04Z","zone_id":"196e0755-3073-457c-8bcd-b0db42dd67f4"}]
+--- PASS: TestReservationFlowAndCapacityEndpoints (1.47s)
+=== RUN   TestReservationConfirmExpiredHold
+    reservations_api_test.go:167:   → POST /api/auth/login
+    reservations_api_test.go:167:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:06Z"}
+    reservations_api_test.go:168:   → POST /api/facilities
+    reservations_api_test.go:168:   ← 201 {"id":"977ca9ef-407f-4eb2-b8d3-01085fbd77db"}
+    reservations_api_test.go:168:   → POST /api/lots
+    reservations_api_test.go:168:   ← 201 {"id":"578a6fbe-f501-4a18-bc5a-5d83e22c70b8"}
+    reservations_api_test.go:168:   → POST /api/zones
+    reservations_api_test.go:168:   ← 201 {"id":"5dfc877c-1247-4e1d-84e1-e5cf8dc6863c"}
+    reservations_api_test.go:168:   → POST /api/members
+    reservations_api_test.go:168:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:32:06Z","display_name":"Member Res","id":"49e51445-3ec2-4ed8-9dc2-fd63b520cb66","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    reservations_api_test.go:168:   → POST /api/vehicles
+    reservations_api_test.go:168:   ← 201 {"id":"b416d1fb-f68f-4c15-9737-47a291b52e9a"}
+    reservations_api_test.go:181:   → POST /api/reservations/hold
+    reservations_api_test.go:181:   ← 201 {"available_stalls":1,"hold_expires_at":"2026-04-17T16:47:06Z","id":"da67f148-b912-4d78-9eee-9c1d8033cadd","status":"hold","time_window_end":"2026-04-17T20:32:06Z","time_window_start":"2026-04-17T19:32:06Z"}
+    reservations_api_test.go:193:   → POST /api/reservations/:id/confirm
+    reservations_api_test.go:193:   ← 409 {"code":"HOLD_EXPIRED","message":"reservation hold has expired"}
+--- PASS: TestReservationConfirmExpiredHold (1.42s)
+=== RUN   TestCreateHoldOversellAndConcurrentOversell
+    reservations_api_test.go:201:   → POST /api/auth/login
+    reservations_api_test.go:201:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:07Z"}
+    reservations_api_test.go:202:   → POST /api/facilities
+    reservations_api_test.go:202:   ← 201 {"id":"b311492c-c21c-49b6-973d-fb26f76dcf70"}
+    reservations_api_test.go:202:   → POST /api/lots
+    reservations_api_test.go:202:   ← 201 {"id":"c0a63f46-ca69-461f-acdd-54a7057215e2"}
+    reservations_api_test.go:202:   → POST /api/zones
+    reservations_api_test.go:202:   ← 201 {"id":"9786c02f-ef70-4201-a46c-1c335a5eeed7"}
+    reservations_api_test.go:202:   → POST /api/members
+    reservations_api_test.go:202:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:32:07Z","display_name":"Member Res","id":"97d0f1ce-d6fb-4d5c-a587-062880032049","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    reservations_api_test.go:202:   → POST /api/vehicles
+    reservations_api_test.go:202:   ← 201 {"id":"55d1e235-10b5-4ec9-a230-c2c4f0193fdd"}
+    reservations_api_test.go:215:   → POST /api/reservations/hold
+    reservations_api_test.go:215:   ← 201 {"available_stalls":0,"hold_expires_at":"2026-04-17T16:47:07Z","id":"df59e789-cd0c-454d-a3f4-2d8a91eb5bd3","status":"hold","time_window_end":"2026-04-17T22:32:07Z","time_window_start":"2026-04-17T20:32:07Z"}
+    reservations_api_test.go:228:   → POST /api/reservations/hold
+    reservations_api_test.go:228:   ← 409 {"code":"CAPACITY_CONFLICT","message":"insufficient stalls for requested window"}
+    reservations_api_test.go:235:   → POST /api/auth/login
+    reservations_api_test.go:235:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:08Z"}
+    reservations_api_test.go:236:   → POST /api/facilities
+    reservations_api_test.go:236:   ← 201 {"id":"2fca9bfb-d364-4c78-951c-bb9136a0de5b"}
+    reservations_api_test.go:236:   → POST /api/lots
+    reservations_api_test.go:236:   ← 201 {"id":"38c47a24-7418-41e8-880e-88d9b908f0f2"}
+    reservations_api_test.go:236:   → POST /api/zones
+    reservations_api_test.go:236:   ← 201 {"id":"cc4e24c4-2c61-4e65-a0a3-1b036da970bd"}
+    reservations_api_test.go:236:   → POST /api/members
+    reservations_api_test.go:236:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:32:09Z","display_name":"Member Res","id":"d6396224-c388-47de-9209-b79516c6a7fe","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    reservations_api_test.go:236:   → POST /api/vehicles
+    reservations_api_test.go:236:   ← 201 {"id":"b9f337af-35bf-4139-9e72-29e9a18268b5"}
+--- PASS: TestCreateHoldOversellAndConcurrentOversell (2.91s)
+=== RUN   TestZoneStallReductionBlockedBelowConfirmedDemand
+    reservations_api_test.go:277:   → POST /api/auth/login
+    reservations_api_test.go:277:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:10Z"}
+    reservations_api_test.go:278:   → POST /api/facilities
+    reservations_api_test.go:278:   ← 201 {"id":"cf2c1079-fd52-41d6-b18d-285497a0e5ed"}
+    reservations_api_test.go:278:   → POST /api/lots
+    reservations_api_test.go:278:   ← 201 {"id":"0cf69fdc-e21d-4171-8c67-3a366ce2a53f"}
+    reservations_api_test.go:278:   → POST /api/zones
+    reservations_api_test.go:278:   ← 201 {"id":"c2d21516-ecc8-47d6-8ce7-105102e96f70"}
+    reservations_api_test.go:278:   → POST /api/members
+    reservations_api_test.go:278:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:32:10Z","display_name":"Member Res","id":"93c6551a-49ac-45c4-bdc2-e6c1ed80f9f4","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    reservations_api_test.go:278:   → POST /api/vehicles
+    reservations_api_test.go:278:   ← 201 {"id":"5057a25c-a0d1-4cb7-803d-45762b9aea64"}
+    reservations_api_test.go:291:   → POST /api/reservations/hold
+    reservations_api_test.go:291:   ← 201 {"available_stalls":1,"hold_expires_at":"2026-04-17T16:47:10Z","id":"495eb23c-508e-40bb-9873-618ad96b1412","status":"hold","time_window_end":"2026-04-18T00:32:10Z","time_window_start":"2026-04-17T22:32:10Z"}
+    reservations_api_test.go:298:   → POST /api/reservations/:id/confirm
+    reservations_api_test.go:298:   ← 200 {"confirmed_at":"2026-04-17T16:32:10Z","id":"495eb23c-508e-40bb-9873-618ad96b1412","status":"confirmed"}
+    reservations_api_test.go:304:   → PATCH /api/zones/:id
+    reservations_api_test.go:304:   ← 409 {"code":"CAPACITY_CONFLICT","message":"zone total stalls cannot go below confirmed reservations"}
+--- PASS: TestZoneStallReductionBlockedBelowConfirmedDemand (1.61s)
+=== RUN   TestReservationCalendarPageRenders
+    reservations_api_test.go:312:   → POST /api/auth/login
+    reservations_api_test.go:312:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:12Z"}
+    reservations_api_test.go:315:   → GET /reservations
+    reservations_api_test.go:315:   ← 200 <!doctype html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Reservations - ParkOps</title>
+          <style>
+        		:root{--bg:#f1f5f9;--panel:#fff;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;--brand:#047857}
+        		body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
+            .toast-container{position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem;pointer-events:none}
+            .toast{pointer-events:auto;min-width:280px;max-width:380px;padding:.75rem 1rem;border-radius:.5rem;font-size:.875rem;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,.15);display:flex;align-items:center;gap:.5rem;animation:toast-in .3s ease-out,toast-out .3s ease-in 3.7s forwards}
+            .toast-success{background:#065f46;color:#fff}
+            .toast-error{background:#991b1b;color:#fff}
+            .toast-info{background:#1e3a5f;color:#fff}
+            @keyframes toast-in{from{opacity:0;transform:translateX(100%)}to{opacity:1;transform:translateX(0)}}
+            @keyframes toast-out{from{opacity:1}to{opacity:0}}
+          </style>
+        </head>
+        <body class="min-h-screen bg-slate-100 text-slate-900">
+          <div id="toastContainer" class="toast-container"></div>
+          <div class="flex min-h-screen">
+            <aside class="w-72 border-r border-slate-200 bg-white">
+              <div class="border-b border-slate-200 px-6 py-5">
+                <p class="text-xs font-semibold uppercase tracking-widest text-emerald-700">ParkOps</p>
+                <p class="mt-2 text-sm text-slate-600">Operator Console</p>
+              </div>
+              <nav class="px-3 py-4"><a class="mb-1 block rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100" href="/dashboard">Dashboard</a><a class="mb-1 block rounded-md bg-emerald-100 px-3 py-2 text-sm font-semibold text-emerald-900" href="/reservations">Reservations</a><a class="mb-1 block rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100" href="/capacity">Capacity</a><a class="mb-1 block rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100" href="/members">Members</a><a class="mb-1 block rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100" href="/vehicles">Vehicles</a><a class="mb-1 block rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100" href="/drivers">Drivers</a><a class="mb-1 block rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100" href="/facilities">Facilities</a><a class="mb-1 block rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100" href="/lots">Lots</a><a class="mb-1 block rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100" href="/zones">Zones</a><a class="mb-1 block rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100" href="/rate-plans">Rate Plans</a><a class="mb-1 block rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100" href="/campaigns">Campaigns</a><a class="mb-1 block rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100" href="/tasks">Tasks</a><a class="mb-1 block rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100" href="/segments">Segments</a><a class="mb-1 block rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100" href="/analytics">Analytics</a><a class="mb-1 block rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100" href="/notifications">Notifications</a><a class="mb-1 block rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100" href="/notification-prefs">Notif Preferences</a><a class="mb-1 block rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100" href="/audit">Audit Log</a><a class="mb-1 block rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100" href="/admin/users">Admin Users</a></nav>
+            </aside>
+        
+            <div class="flex min-h-screen flex-1 flex-col">
+              <header class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
+                <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-3">
+                  <div>
+                    <p class="text-sm font-semibold text-slate-900">ParkOps</p>
+                    <p class="text-xs text-slate-500">Reservations</p>
+                  </div>
+        
+                  <div class="group relative">
+                    <button class="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-700 text-sm font-semibold text-white">AD</button>
+                    <div class="invisible absolute right-0 top-11 w-72 rounded-xl border border-slate-200 bg-white p-4 opacity-0 shadow-lg transition group-hover:visible group-hover:opacity-100">
+                      <p class="text-sm font-semibold text-slate-900">Admin</p>
+                      <p class="text-xs text-slate-600">@admin</p>
+                      <p class="mt-2 text-xs text-slate-500">Roles: facility_admin</p>
+                      <form class="mt-3" method="post" action="/auth/logout" onsubmit="const btn=this.querySelector('button[type=submit]'); if(btn){btn.disabled=true; btn.textContent='Signing out...';}">
+                        <button class="w-full rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-60" type="submit">Logout</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </header>
+        
+              <main class="mx-auto w-full max-w-7xl flex-1 p-6">
+                <section class="space-y-6">
+            <header>
+              <h1 class="text-3xl font-semibold">Reservation Calendar</h1>
+              <p class="text-slate-600 mt-2">Manage reservations, check availability, and create new holds.</p>
+            </header>
+        
+            <!-- Date range filter for reservation list -->
+            <section class="rounded-xl bg-white p-5 shadow-sm border border-slate-200 space-y-4">
+              <h2 class="text-lg font-semibold">Reservations</h2>
+              <div class="flex flex-wrap gap-3 items-end">
+                <label class="text-sm">
+                  <span class="mb-1 block text-slate-600">Status</span>
+                  <select id="filterStatus" class="rounded border border-slate-300 px-3 py-2 text-sm">
+                    <option value="">All</option>
+                    <option value="hold">Hold</option>
+                    <option value="confirmed" selected>Confirmed</option>
+                    <option value="cancelled">Cancelled</option>
+                    <option value="expired">Expired</option>
+                  </select>
+                </label>
+                <button id="filterBtn" class="rounded bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800">Load</button>
+              </div>
+              <div id="resState" class="rounded border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">Click Load to fetch reservations.</div>
+              <div class="overflow-x-auto">
+                <table class="min-w-full text-left text-sm">
+                  <thead class="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500">
+                    <tr>
+                      <th class="px-3 py-2">ID</th>
+                      <th class="px-3 py-2">Zone</th>
+                      <th class="px-3 py-2">Status</th>
+                      <th class="px-3 py-2">Stalls</th>
+                      <th class="px-3 py-2">Window Start</th>
+                      <th class="px-3 py-2">Window End</th>
+                      <th class="px-3 py-2">Hold Expires</th>
+                    </tr>
+                  </thead>
+                  <tbody id="resBody" class="divide-y divide-slate-100"></tbody>
+                </table>
+              </div>
+            </section>
+        
+            <!-- Availability checker with date pickers -->
+            <section class="rounded-xl bg-white p-5 shadow-sm border border-slate-200 space-y-4">
+              <h2 class="text-lg font-semibold">Check Availability</h2>
+              <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <label class="text-sm">
+                  <span class="mb-1 block text-slate-600">Zone</span>
+                  <select id="zoneSelect" class="w-full rounded border border-slate-300 px-3 py-2">
+                    <option value="">Loading zones...</option>
+                  </select>
+                </label>
+                <label class="text-sm">
+                  <span class="mb-1 block text-slate-600">Start</span>
+                  <input id="startAt" type="datetime-local" class="w-full rounded border border-slate-300 px-3 py-2" />
+                </label>
+                <label class="text-sm">
+                  <span class="mb-1 block text-slate-600">End</span>
+                  <input id="endAt" type="datetime-local" class="w-full rounded border border-slate-300 px-3 py-2" />
+                </label>
+                <label class="text-sm">
+                  <span class="mb-1 block text-slate-600">Stalls needed</span>
+                  <input id="stallCount" type="number" min="1" value="1" class="w-full rounded border border-slate-300 px-3 py-2" />
+                </label>
+              </div>
+              <button id="checkBtn" class="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">Check Availability</button>
+              <div id="result" class="rounded border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">Select a zone and time window, then click Check.</div>
+              <div id="warning" class="hidden rounded border border-amber-300 bg-amber-50 p-3 text-sm font-medium text-amber-800">
+                Conflict warning: not enough stalls available for this request.
+              </div>
+            </section>
+        
+          <script>
+            // Set default dates
+            const now = new Date();
+            const later = new Date(now.getTime() + 4*3600*1000);
+            document.getElementById('startAt').value = now.toISOString().slice(0,16);
+            document.getElementById('endAt').value = later.toISOString().slice(0,16);
+        
+            // Load zones into dropdown
+            (async function loadZones() {
+              try {
+                const res = await fetch('/api/capacity/dashboard', { credentials: 'same-origin' });
+                const data = await res.json();
+                const zones = Array.isArray(data.zones) ? data.zones : [];
+                const sel = document.getElementById('zoneSelect');
+                sel.innerHTML = zones.length === 0
+                  ? '<option value="">No zones</option>'
+                  : zones.map(z => '<option value="'+z.zone_id+'">'+z.zone_name+' ('+z.available_stalls+'/'+z.total_stalls+' avail)</option>').join('');
+              } catch(e) { console.error(e); }
+            })();
+        
+            // Load reservations
+            document.getElementById('filterBtn').addEventListener('click', async () => {
+              const status = document.getElementById('filterStatus').value;
+              let url = '/api/reservations?limit=50';
+              if (status) url += '&status=' + status;
+              const state = document.getElementById('resState');
+              const body = document.getElementById('resBody');
+              try {
+                const res = await fetch(url, { credentials: 'same-origin' });
+                const payload = await res.json();
+                if (!res.ok) { state.textContent = payload.message || 'Failed'; return; }
+                const rows = Array.isArray(payload.items) ? payload.items : (Array.isArray(payload) ? payload : []);
+                if (rows.length === 0) { state.textContent = 'No reservations found.'; body.innerHTML=''; return; }
+                body.innerHTML = rows.map(r => {
+                  const statusClass = r.status==='confirmed'?'text-emerald-700':r.status==='hold'?'text-amber-700':r.status==='cancelled'?'text-rose-600':'text-slate-500';
+                  return '<tr>'
+                    +'<td class="px-3 py-2 font-mono text-xs">'+r.id.slice(0,8)+'</td>'
+                    +'<td class="px-3 py-2">'+(r.zone_id||'').slice(0,8)+'</td>'
+                    +'<td class="px-3 py-2 font-semibold '+statusClass+'">'+r.status+'</td>'
+                    +'<td class="px-3 py-2">'+r.stall_count+'</td>'
+                    +'<td class="px-3 py-2 text-xs">'+fmt(r.time_window_start)+'</td>'
+                    +'<td class="px-3 py-2 text-xs">'+fmt(r.time_window_end)+'</td>'
+                    +'<td class="px-3 py-2 text-xs">'+(r.hold_expires_at?fmt(r.hold_expires_at):'-')+'</td>'
+                    +'</tr>';
+                }).join('');
+                state.textContent = 'Showing '+rows.length+' reservations.';
+                if(window.parkopsToast) window.parkopsToast('Loaded '+rows.length+' reservations','success');
+              } catch(e) { state.textContent = 'Error loading reservations'; }
+            });
+        
+            function fmt(iso) { if(!iso) return '-'; try { return new Date(iso).toLocaleString(); } catch(e) { return iso; } }
+        
+            // Availability check
+            document.getElementById('checkBtn').addEventListener('click', async () => {
+              const warning = document.getElementById('warning');
+              const result = document.getElementById('result');
+              warning.classList.add('hidden');
+              const zoneId = document.getElementById('zoneSelect').value;
+              const startVal = document.getElementById('startAt').value;
+              const endVal = document.getElementById('endAt').value;
+              const requested = parseInt(document.getElementById('stallCount').value || '1', 10);
+              if (!zoneId || !startVal || !endVal) { result.textContent = 'Please fill in zone and dates.'; return; }
+              const startISO = new Date(startVal).toISOString();
+              const endISO = new Date(endVal).toISOString();
+              const url = '/api/availability?zone_id='+encodeURIComponent(zoneId)+'&time_window_start='+encodeURIComponent(startISO)+'&time_window_end='+encodeURIComponent(endISO);
+              try {
+                const res = await fetch(url, { credentials: 'same-origin' });
+                const payload = await res.json();
+                if (!res.ok) { result.textContent = payload.message || 'Failed'; return; }
+                result.textContent = 'Available: '+payload.available_stalls+' / '+payload.total_stalls+' stalls';
+                if (Number(payload.available_stalls) < requested) { warning.classList.remove('hidden'); }
+                else if(window.parkopsToast) window.parkopsToast('Availability check passed','success');
+              } catch(e) { result.textContent = 'Error checking availability'; }
+            });
+        
+            // Auto-load confirmed reservations on page load
+            document.getElementById('filterBtn').click();
+          </script>
+        </section>
+              </main>
+            </div>
+          </div>
+          <script>
+          (function(){
+            var msgs={login_success:['Signed in successfully','success'],login_error:['Invalid username or password','error'],logout_success:['You have been signed out','success'],session_expired:['Session expired, please sign in again','info'],password_changed:['Password changed successfully','success'],forbidden:['You do not have permission','error']};
+            function showToast(text,type){
+              var c=document.getElementById('toastContainer');if(!c)return;
+              var el=document.createElement('div');el.className='toast toast-'+(type||'info');
+              var icon=type==='success'?'\u2713':type==='error'?'\u2717':'\u2139';
+              el.textContent=icon+' '+text;c.appendChild(el);
+              setTimeout(function(){el.remove()},4200);
+            }
+            var p=new URLSearchParams(window.location.search);var t=p.get('toast');
+            if(t&&msgs[t]){showToast(msgs[t][0],msgs[t][1]);var u=new URL(window.location);u.searchParams.delete('toast');window.history.replaceState({},'',u)}
+            window.parkopsToast=showToast;
+          })();
+          </script>
+        </body>
+        </html>
+--- PASS: TestReservationCalendarPageRenders (1.54s)
+=== RUN   TestReservationTimelineFleetCrossOrgForbidden
+    reservations_api_test.go:326:   → POST /api/auth/login
+    reservations_api_test.go:326:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:13Z"}
+    reservations_api_test.go:327:   → POST /api/auth/login
+    reservations_api_test.go:327:   ← 200 {"id":"33333333-3333-3333-3333-333333333333","username":"fleet","display_name":"Fleet","status":"active","roles":["fleet_manager"],"force_password_change":false,"created_at":"2026-04-17T16:32:13Z"}
+    reservations_api_test.go:328:   → POST /api/facilities
+    reservations_api_test.go:328:   ← 201 {"id":"6252660a-2c8f-4063-9c2e-7ca9a874faa1"}
+    reservations_api_test.go:328:   → POST /api/lots
+    reservations_api_test.go:328:   ← 201 {"id":"fefb7d88-2a81-4a77-acb5-35a7bde920e8"}
+    reservations_api_test.go:328:   → POST /api/zones
+    reservations_api_test.go:328:   ← 201 {"id":"6e413799-f2e1-4f08-a22f-c3e1b2cb6666"}
+    reservations_api_test.go:328:   → POST /api/members
+    reservations_api_test.go:328:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:32:14Z","display_name":"Member Res","id":"8fa48fe4-81af-4c96-87d5-013ffa5c243e","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    reservations_api_test.go:328:   → POST /api/vehicles
+    reservations_api_test.go:328:   ← 201 {"id":"9e3da9aa-ae6f-44d1-b207-fdbb12d74783"}
+    reservations_api_test.go:347:   → GET /api/reservations/:id/timeline
+    reservations_api_test.go:347:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+--- PASS: TestReservationTimelineFleetCrossOrgForbidden (1.92s)
+=== RUN   TestAvailabilityValidationErrors
+    reservations_api_test.go:355:   → POST /api/auth/login
+    reservations_api_test.go:355:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:15Z"}
+    reservations_api_test.go:358:   → GET /api/availability
+    reservations_api_test.go:358:   ← 400 {"code":"VALIDATION_ERROR","message":"time_window_start must be RFC3339"}
+--- PASS: TestAvailabilityValidationErrors (1.50s)
+=== RUN   TestCapacitySnapshotLimit
+    reservations_api_test.go:377:   → POST /api/auth/login
+    reservations_api_test.go:377:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:17Z"}
+    reservations_api_test.go:380:   → GET /api/capacity/snapshots
+    reservations_api_test.go:380:   ← 200 []
+--- PASS: TestCapacitySnapshotLimit (1.48s)
+=== RUN   TestListHoldsAndExceptionsEndpoints
+    reservations_api_test.go:388:   → POST /api/auth/login
+    reservations_api_test.go:388:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:18Z"}
+    reservations_api_test.go:389:   → POST /api/facilities
+    reservations_api_test.go:389:   ← 201 {"id":"3ab5bdf5-babd-429c-aca5-695100a64b2b"}
+    reservations_api_test.go:389:   → POST /api/lots
+    reservations_api_test.go:389:   ← 201 {"id":"581ffd8b-cf3a-4669-894e-4215a62209c7"}
+    reservations_api_test.go:389:   → POST /api/zones
+    reservations_api_test.go:389:   ← 201 {"id":"e02f321b-6b4c-47ad-9fd4-9fd0d2aaa430"}
+    reservations_api_test.go:389:   → POST /api/members
+    reservations_api_test.go:389:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:32:18Z","display_name":"Member Res","id":"cbcbd398-72b0-4333-9da2-92fe3815bfdf","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    reservations_api_test.go:389:   → POST /api/vehicles
+    reservations_api_test.go:389:   ← 201 {"id":"d8d610c6-a495-4e3a-b773-8d817e9bf673"}
+    reservations_api_test.go:406:   → GET /api/reservations?status=hold
+    reservations_api_test.go:406:   ← 200 {"items":[{"hold_expires_at":"2026-04-17T16:47:18Z","id":"ffcaeebd-ac23-4a80-9306-7852a94b21ef","member_id":"cbcbd398-72b0-4333-9da2-92fe3815bfdf","stall_count":1,"status":"hold","time_window_end":"2026-04-18T01:32:18Z","time_window_start":"2026-04-18T00:32:18Z","vehicle_id":"d8d610c6-a495-4e3a-b773-8d817e9bf673","zone_id":"e02f321b-6b4c-47ad-9fd4-9fd0d2aaa430"}],"total":1}
+    reservations_api_test.go:412:   → GET /api/exceptions
+    reservations_api_test.go:412:   ← 200 {"items":[],"total":0}
+--- PASS: TestListHoldsAndExceptionsEndpoints (1.59s)
+=== RUN   TestLoginPageRenders
+    router_api_test.go:13:   → GET /login
+    router_api_test.go:13:   ← 200 <!doctype html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>ParkOps Login</title>
+          <script src="https://cdn.tailwindcss.com"></script>
+          <style>
+            .toast-container{position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem;pointer-events:none}
+            .toast{pointer-events:auto;min-width:280px;max-width:380px;padding:.75rem 1rem;border-radius:.5rem;font-size:.875rem;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,.15);display:flex;align-items:center;gap:.5rem;animation:toast-in .3s ease-out,toast-out .3s ease-in 3.7s forwards}
+            .toast-success{background:#065f46;color:#fff}
+            .toast-error{background:#991b1b;color:#fff}
+            .toast-info{background:#1e3a5f;color:#fff}
+            @keyframes toast-in{from{opacity:0;transform:translateX(100%)}to{opacity:1;transform:translateX(0)}}
+            @keyframes toast-out{from{opacity:1}to{opacity:0}}
+          </style>
+        </head>
+        <body class="min-h-screen bg-slate-100 text-slate-900">
+          <div id="toastContainer" class="toast-container"></div>
+          <main class="mx-auto flex min-h-screen max-w-md items-center p-6">
+            <section class="w-full rounded-xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+              <p class="text-sm font-medium uppercase tracking-widest text-emerald-700">ParkOps</p>
+              <h1 class="mt-2 text-3xl font-semibold">Sign in</h1>
+              <p class="mt-1 text-sm text-slate-600">Local operations console</p>
+              <form class="mt-8 space-y-4" method="post" action="/auth/login">
+                <label class="block">
+                  <span class="mb-1 block text-sm font-medium">Username</span>
+                  <input class="w-full rounded-md border border-slate-300 px-3 py-2" type="text" name="username" autocomplete="username" required>
+                </label>
+                <label class="block">
+                  <span class="mb-1 block text-sm font-medium">Password</span>
+                  <input class="w-full rounded-md border border-slate-300 px-3 py-2" type="password" name="password" autocomplete="current-password" required>
+                </label>
+                <button class="w-full rounded-md bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800" type="submit">Sign in</button>
+              </form>
+            </section>
+          </main>
+          <script>
+          (function(){
+            var msgs={login_success:['Signed in successfully','success'],login_error:['Invalid username or password','error'],logout_success:['You have been signed out','success'],session_expired:['Session expired, please sign in again','info'],password_changed:['Password changed successfully','success']};
+            function showToast(text,type){
+              var c=document.getElementById('toastContainer');if(!c)return;
+              var el=document.createElement('div');el.className='toast toast-'+(type||'info');
+              var icon=type==='success'?'\u2713':type==='error'?'\u2717':'\u2139';
+              el.textContent=icon+' '+text;c.appendChild(el);
+              setTimeout(function(){el.remove()},4200);
+            }
+            var p=new URLSearchParams(window.location.search);var t=p.get('toast');
+            if(t&&msgs[t]){showToast(msgs[t][0],msgs[t][1]);var u=new URL(window.location);u.searchParams.delete('toast');window.history.replaceState({},'',u)}
+          })();
+          </script>
+        </body>
+        </html>
+--- PASS: TestLoginPageRenders (1.32s)
+=== RUN   TestAPINotFoundUsesStandardErrorShape
+    router_api_test.go:37:   → GET /api/does-not-exist
+    router_api_test.go:37:   ← 404 {"code":"NOT_FOUND","message":"resource not found"}
+--- PASS: TestAPINotFoundUsesStandardErrorShape (1.22s)
+=== RUN   TestSwaggerRequiresAuth
+    router_api_test.go:55:   → GET /swagger/index.html
+    router_api_test.go:55:   ← 303 <a href="/login?toast=session_expired">See Other</a>.
+        
+        {"code":"UNAUTHORIZED","message":"authentication required"}
+--- PASS: TestSwaggerRequiresAuth (1.15s)
+=== RUN   TestSwaggerAccessibleForAdmin
+    router_api_test.go:68:   → POST /api/auth/login
+    router_api_test.go:68:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:23Z"}
+    router_api_test.go:70:   → GET /swagger/index.html (admin)
+    router_api_test.go:70:   ← 200 
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <title>Swagger UI</title>
+          <link rel="stylesheet" type="text/css" href="./swagger-ui.css" >
+          <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32" />
+          <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16" />
+          <link rel="stylesheet" type="text/css" href="index.css" />
+        </head>
+        
+        <body>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0">
+          <defs>
+            <symbol viewBox="0 0 20 20" id="unlocked">
+                  <path d="M15.8 8H14V5.6C14 2.703 12.665 1 10 1 7.334 1 6 2.703 6 5.6V6h2v-.801C8 3.754 8.797 3 10 3c1.203 0 2 .754 2 2.199V8H4c-.553 0-1 .646-1 1.199V17c0 .549.428 1.139.951 1.307l1.197.387C5.672 18.861 6.55 19 7.1 19h5.8c.549 0 1.428-.139 1.951-.307l1.196-.387c.524-.167.953-.757.953-1.306V9.199C17 8.646 16.352 8 15.8 8z"></path>
+            </symbol>
+        
+            <symbol viewBox="0 0 20 20" id="locked">
+              <path d="M15.8 8H14V5.6C14 2.703 12.665 1 10 1 7.334 1 6 2.703 6 5.6V8H4c-.553 0-1 .646-1 1.199V17c0 .549.428 1.139.951 1.307l1.197.387C5.672 18.861 6.55 19 7.1 19h5.8c.549 0 1.428-.139 1.951-.307l1.196-.387c.524-.167.953-.757.953-1.306V9.199C17 8.646 16.352 8 15.8 8zM12 8H8V5.199C8 3.754 8.797 3 10 3c1.203 0 2 .754 2 2.199V8z"/>
+            </symbol>
+        
+            <symbol viewBox="0 0 20 20" id="close">
+              <path d="M14.348 14.849c-.469.469-1.229.469-1.697 0L10 11.819l-2.651 3.029c-.469.469-1.229.469-1.697 0-.469-.469-.469-1.229 0-1.697l2.758-3.15-2.759-3.152c-.469-.469-.469-1.228 0-1.697.469-.469 1.228-.469 1.697 0L10 8.183l2.651-3.031c.469-.469 1.228-.469 1.697 0 .469.469.469 1.229 0 1.697l-2.758 3.152 2.758 3.15c.469.469.469 1.229 0 1.698z"/>
+            </symbol>
+        
+            <symbol viewBox="0 0 20 20" id="large-arrow">
+              <path d="M13.25 10L6.109 2.58c-.268-.27-.268-.707 0-.979.268-.27.701-.27.969 0l7.83 7.908c.268.271.268.709 0 .979l-7.83 7.908c-.268.271-.701.27-.969 0-.268-.269-.268-.707 0-.979L13.25 10z"/>
+            </symbol>
+        
+            <symbol viewBox="0 0 20 20" id="large-arrow-down">
+              <path d="M17.418 6.109c.272-.268.709-.268.979 0s.271.701 0 .969l-7.908 7.83c-.27.268-.707.268-.979 0l-7.908-7.83c-.27-.268-.27-.701 0-.969.271-.268.709-.268.979 0L10 13.25l7.418-7.141z"/>
+            </symbol>
+        
+        
+            <symbol viewBox="0 0 24 24" id="jump-to">
+              <path d="M19 7v4H5.83l3.58-3.59L8 6l-6 6 6 6 1.41-1.41L5.83 13H21V7z"/>
+            </symbol>
+        
+            <symbol viewBox="0 0 24 24" id="expand">
+              <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/>
+            </symbol>
+        
+          </defs>
+        </svg>
+        
+        <div id="swagger-ui"></div>
+        
+        <script src="./swagger-ui-bundle.js"> </script>
+        <script src="./swagger-ui-standalone-preset.js"> </script>
+        <script src="./swagger-initializer.js"> </script>
+        </body>
+        
+        </html>
+--- PASS: TestSwaggerAccessibleForAdmin (1.48s)
+=== RUN   TestTagCRUDAndMemberTagging
+    segments_api_test.go:15:   → POST /api/auth/login
+    segments_api_test.go:15:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:25Z"}
+    segments_api_test.go:21:   → POST /api/tags
+    segments_api_test.go:21:   ← 201 {"id":"4f472dab-0893-4e9d-889a-48bce90a670a","name":"downtown_monthly"}
+    segments_api_test.go:29:   → GET /api/tags
+    segments_api_test.go:29:   ← 200 [{"created_at":"2026-04-17T16:32:25Z","id":"4f472dab-0893-4e9d-889a-48bce90a670a","name":"downtown_monthly"}]
+    segments_api_test.go:45:   → POST /api/members
+    segments_api_test.go:45:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:32:25Z","display_name":"Test Member","id":"34ae1ff8-0711-4c3d-8022-6061f5953bd3","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    segments_api_test.go:55:   → POST /api/members/:id/tags
+    segments_api_test.go:55:   ← 200 {"message":"tag added"}
+    segments_api_test.go:62:   → GET /api/members/:id/tags
+    segments_api_test.go:62:   ← 200 [{"id":"4f472dab-0893-4e9d-889a-48bce90a670a","name":"downtown_monthly"}]
+    segments_api_test.go:69:   → DELETE /api/members/:id/tags/:tagId
+    segments_api_test.go:69:   ← 200 {"message":"tag removed"}
+    segments_api_test.go:76:   → GET /api/members/:id/tags (after remove)
+    segments_api_test.go:76:   ← 200 []
+    segments_api_test.go:83:   → DELETE /api/tags/:id
+    segments_api_test.go:83:   ← 204 
+--- PASS: TestTagCRUDAndMemberTagging (1.52s)
+=== RUN   TestSegmentCRUDAndPreviewRun
+    segments_api_test.go:91:   → POST /api/auth/login
+    segments_api_test.go:91:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:26Z"}
+    segments_api_test.go:101:   → POST /api/members
+    segments_api_test.go:101:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:32:27Z","display_name":"High Arrears Member","id":"1cbc7acd-dcb1-4725-8981-fe1ec6f18e6c","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    segments_api_test.go:112:   → PATCH /api/members/:id/balance
+    segments_api_test.go:112:   ← 200 {"arrears_balance_cents":10000}
+    segments_api_test.go:123:   → POST /api/segments
+    segments_api_test.go:123:   ← 201 {"filter_expression":{"arrears_balance_cents":{"gt":5000}},"id":"ad9ecad4-86a4-412a-853d-fa2f9638eff7","name":"High Arrears","schedule":"manual"}
+    segments_api_test.go:131:   → GET /api/segments/:id
+    segments_api_test.go:131:   ← 200 {"created_at":"2026-04-17T16:32:27Z","filter_expression":{"arrears_balance_cents":{"gt":5000}},"id":"ad9ecad4-86a4-412a-853d-fa2f9638eff7","name":"High Arrears","schedule":"manual","updated_at":"2026-04-17T16:32:27Z"}
+    segments_api_test.go:138:   → POST /api/segments/:id/preview
+    segments_api_test.go:138:   ← 200 {"member_count":1}
+    segments_api_test.go:150:   → POST /api/segments/:id/run
+    segments_api_test.go:150:   ← 200 {"id":"a6a2d11b-5f0a-4ff0-8456-598fc97521f5","member_count":1,"ran_at":"2026-04-17T16:32:27Z","segment_id":"ad9ecad4-86a4-412a-853d-fa2f9638eff7","triggered_by":"manual"}
+    segments_api_test.go:162:   → GET /api/segments/:id/runs
+    segments_api_test.go:162:   ← 200 [{"id":"a6a2d11b-5f0a-4ff0-8456-598fc97521f5","member_count":1,"ran_at":"2026-04-17T16:32:27Z","segment_id":"ad9ecad4-86a4-412a-853d-fa2f9638eff7","triggered_by":"manual"}]
+    segments_api_test.go:171:   → PATCH /api/segments/:id
+    segments_api_test.go:171:   ← 200 {"message":"updated"}
+    segments_api_test.go:178:   → DELETE /api/segments/:id
+    segments_api_test.go:178:   ← 204 
+--- PASS: TestSegmentCRUDAndPreviewRun (1.62s)
+=== RUN   TestTagExportImport
+    segments_api_test.go:186:   → POST /api/auth/login
+    segments_api_test.go:186:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:28Z"}
+    segments_api_test.go:214:   → POST /api/tags/export
+    segments_api_test.go:214:   ← 200 {"exported_at":"2026-04-17T16:32:28Z","id":"9b76ecbf-0fe7-4c18-b9bb-5d7156cbbbf6","snapshot":{"a948bc45-7403-480b-94f7-5376442717de":["vip"]}}
+    segments_api_test.go:228:   → POST /api/tags/import
+    segments_api_test.go:228:   ← 200 {"message":"tags restored","version_id":"fe30ee02-0cca-46c4-a2ee-8eef7ce19109"}
+--- PASS: TestTagExportImport (1.54s)
+=== RUN   TestSegmentFilterEvaluation
+--- PASS: TestSegmentFilterEvaluation (1.34s)
+=== RUN   TestSegmentRBACForbidden
+    segments_api_test.go:280:   → POST /api/auth/login
+    segments_api_test.go:280:   ← 200 {"id":"22222222-2222-2222-2222-222222222222","username":"operator","display_name":"Operator","status":"active","roles":["dispatch_operator"],"force_password_change":false,"created_at":"2026-04-17T16:32:31Z"}
+    segments_api_test.go:287:   → POST /api/segments (operator)
+    segments_api_test.go:287:   ← 403 {"code":"FORBIDDEN","message":"forbidden"}
+    segments_api_test.go:294:   → GET /api/segments (operator)
+    segments_api_test.go:294:   ← 200 []
+--- PASS: TestSegmentRBACForbidden (1.46s)
+=== RUN   TestTCPSmoke_Health
+--- PASS: TestTCPSmoke_Health (1.30s)
+=== RUN   TestTCPSmoke_MeAfterLogin
+--- PASS: TestTCPSmoke_MeAfterLogin (1.62s)
+=== RUN   TestTCPSmoke_ProtectedWithoutAuthReturns401
+--- PASS: TestTCPSmoke_ProtectedWithoutAuthReturns401 (1.56s)
+=== RUN   TestTCPSmoke_DashboardUnauthRedirectsToLogin
+--- PASS: TestTCPSmoke_DashboardUnauthRedirectsToLogin (1.43s)
+=== RUN   TestTCPSmoke_CreateFacilityRoundTrip
+--- PASS: TestTCPSmoke_CreateFacilityRoundTrip (1.47s)
+=== RUN   TestSubmitTrackingLocationAndGetPositions
+    tracking_api_test.go:22:   → POST /api/auth/login
+    tracking_api_test.go:22:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:40Z"}
+    tracking_api_test.go:23:   → POST /api/facilities
+    tracking_api_test.go:23:   ← 201 {"id":"cb005419-7fa5-4a3e-bdbc-1fc27d6cbd49"}
+    tracking_api_test.go:23:   → POST /api/lots
+    tracking_api_test.go:23:   ← 201 {"id":"a93a033d-0c7b-43c3-a63b-44e3d28447a4"}
+    tracking_api_test.go:23:   → POST /api/zones
+    tracking_api_test.go:23:   ← 201 {"id":"ae7cb1f0-24e4-4b1a-9472-2246060d469e"}
+    tracking_api_test.go:23:   → POST /api/members
+    tracking_api_test.go:23:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:32:40Z","display_name":"Member Res","id":"d0769bab-b358-470f-86b0-75f72808fcc0","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    tracking_api_test.go:23:   → POST /api/vehicles
+    tracking_api_test.go:23:   ← 201 {"id":"9d039193-a175-4e7f-8487-e8e32cc9d7a4"}
+    tracking_api_test.go:38:   → POST /api/tracking/location
+    tracking_api_test.go:38:   ← 201 {"confirmed":true,"device_time_trusted":true,"id":"2528a033-7020-4d29-92a8-a7cde2965175","suspect":false}
+    tracking_api_test.go:44:   → GET /api/tracking/vehicles/:id/positions
+    tracking_api_test.go:44:   ← 200 {"items":[{"confirmed":true,"device_time":"2026-04-17T16:32:40Z","device_time_trusted":true,"id":"2528a033-7020-4d29-92a8-a7cde2965175","latitude":37.7749,"longitude":-122.4194,"received_at":"2026-04-17T16:32:40Z","suspect":false}],"total":1}
+--- PASS: TestSubmitTrackingLocationAndGetPositions (1.49s)
+=== RUN   TestTrackingInvalidSignatureNotTrusted
+    tracking_api_test.go:52:   → POST /api/auth/login
+    tracking_api_test.go:52:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:41Z"}
+    tracking_api_test.go:53:   → POST /api/facilities
+    tracking_api_test.go:53:   ← 201 {"id":"7fd5bb57-ffc6-43a9-8e64-112fdcd520fe"}
+    tracking_api_test.go:53:   → POST /api/lots
+    tracking_api_test.go:53:   ← 201 {"id":"ba4e1d12-7d0d-4503-9924-08704877c6a9"}
+    tracking_api_test.go:53:   → POST /api/zones
+    tracking_api_test.go:53:   ← 201 {"id":"951be7d6-4843-48c3-b334-24ca9119a1db"}
+    tracking_api_test.go:53:   → POST /api/members
+    tracking_api_test.go:53:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:32:42Z","display_name":"Member Res","id":"7e1b7b0f-96fc-4104-acd8-8eea08f43a52","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    tracking_api_test.go:53:   → POST /api/vehicles
+    tracking_api_test.go:53:   ← 201 {"id":"06797683-bdda-401c-9c1e-b62f415ec598"}
+    tracking_api_test.go:63:   → POST /api/tracking/location
+    tracking_api_test.go:63:   ← 201 {"confirmed":true,"device_time_trusted":false,"id":"9537a4ee-aaa8-4cba-ad80-1f9d92dc389d","suspect":false}
+--- PASS: TestTrackingInvalidSignatureNotTrusted (1.63s)
+=== RUN   TestTrackingPlateNumberAsSecretNotTrusted
+    tracking_api_test.go:71:   → POST /api/auth/login
+    tracking_api_test.go:71:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:44Z"}
+    tracking_api_test.go:72:   → POST /api/facilities
+    tracking_api_test.go:72:   ← 201 {"id":"1c674f1a-0f8e-41c0-819f-1bb5d94a616a"}
+    tracking_api_test.go:72:   → POST /api/lots
+    tracking_api_test.go:72:   ← 201 {"id":"392b994d-5a0e-4a52-bc7a-a04b58c4ae7b"}
+    tracking_api_test.go:72:   → POST /api/zones
+    tracking_api_test.go:72:   ← 201 {"id":"8dd360b3-fffe-42cd-85bc-67a2bf74ffe0"}
+    tracking_api_test.go:72:   → POST /api/members
+    tracking_api_test.go:72:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:32:44Z","display_name":"Member Res","id":"6dd1065d-5df7-46c0-aa87-5df4b6e22ac4","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    tracking_api_test.go:72:   → POST /api/vehicles
+    tracking_api_test.go:72:   ← 201 {"id":"ff3d317f-49f3-4116-8414-74de1ad50b40"}
+    tracking_api_test.go:85:   → POST /api/tracking/location (plate secret)
+    tracking_api_test.go:85:   ← 201 {"confirmed":true,"device_time_trusted":false,"id":"539ac75c-fbf4-463d-abdf-09ef92661c95","suspect":false}
+--- PASS: TestTrackingPlateNumberAsSecretNotTrusted (2.29s)
+=== RUN   TestTrackingDedicatedSecretProducesTrusted
+    tracking_api_test.go:96:   → POST /api/auth/login
+    tracking_api_test.go:96:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:46Z"}
+    tracking_api_test.go:97:   → POST /api/facilities
+    tracking_api_test.go:97:   ← 201 {"id":"1a04d1c6-6912-4801-becc-0f6870ba5801"}
+    tracking_api_test.go:97:   → POST /api/lots
+    tracking_api_test.go:97:   ← 201 {"id":"2038b309-325f-4be3-ab49-185fa81a1d60"}
+    tracking_api_test.go:97:   → POST /api/zones
+    tracking_api_test.go:97:   ← 201 {"id":"4329f9a5-d1b4-408c-9df5-0f952f4fd06e"}
+    tracking_api_test.go:97:   → POST /api/members
+    tracking_api_test.go:97:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:32:46Z","display_name":"Member Res","id":"0fe1a69c-fb1e-424d-85df-c9c148c904ec","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    tracking_api_test.go:97:   → POST /api/vehicles
+    tracking_api_test.go:97:   ← 201 {"id":"aaad3578-c45b-499a-bfb4-6388870f4960"}
+    tracking_api_test.go:112:   → POST /api/tracking/location (dedicated secret)
+    tracking_api_test.go:112:   ← 201 {"confirmed":true,"device_time_trusted":true,"id":"bc6e6d52-be98-49fc-88d5-6da994617c7a","suspect":false}
+--- PASS: TestTrackingDedicatedSecretProducesTrusted (2.04s)
+=== RUN   TestTrackingSigningSecretNotExposedInVehicleAPI
+    tracking_api_test.go:120:   → POST /api/auth/login
+    tracking_api_test.go:120:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:47Z"}
+    tracking_api_test.go:121:   → POST /api/facilities
+    tracking_api_test.go:121:   ← 201 {"id":"2a103304-7688-42a0-bb2b-96aee6dbc064"}
+    tracking_api_test.go:121:   → POST /api/lots
+    tracking_api_test.go:121:   ← 201 {"id":"c7a21855-0b09-4747-8035-26d2d94a6890"}
+    tracking_api_test.go:121:   → POST /api/zones
+    tracking_api_test.go:121:   ← 201 {"id":"10fd33c2-8fee-4215-b5dd-0d579632fa43"}
+    tracking_api_test.go:121:   → POST /api/members
+    tracking_api_test.go:121:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:32:47Z","display_name":"Member Res","id":"7aee31f6-2dd0-473d-82c8-30e36cb04dcd","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    tracking_api_test.go:121:   → POST /api/vehicles
+    tracking_api_test.go:121:   ← 201 {"id":"99aafa12-5b17-4a0b-a184-ae835fdb3387"}
+    tracking_api_test.go:124:   → GET /api/vehicles/:id
+    tracking_api_test.go:124:   ← 200 {"id":"99aafa12-5b17-4a0b-a184-ae835fdb3387","make":"F","model":"M","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa","plate_number":"RES-123"}
+--- PASS: TestTrackingSigningSecretNotExposedInVehicleAPI (1.58s)
+=== RUN   TestTrackingSuspectPositionHandling
+    tracking_api_test.go:135:   → POST /api/auth/login
+    tracking_api_test.go:135:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:49Z"}
+    tracking_api_test.go:136:   → POST /api/facilities
+    tracking_api_test.go:136:   ← 201 {"id":"69771a1f-cfae-4730-bf37-8275c2e649b9"}
+    tracking_api_test.go:136:   → POST /api/lots
+    tracking_api_test.go:136:   ← 201 {"id":"96838f9b-4aa0-4d55-9889-e051c2c32fbe"}
+    tracking_api_test.go:136:   → POST /api/zones
+    tracking_api_test.go:136:   ← 201 {"id":"366593fd-b5fe-42c2-af29-d94989e52d37"}
+    tracking_api_test.go:136:   → POST /api/members
+    tracking_api_test.go:136:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:32:49Z","display_name":"Member Res","id":"3a8c55fb-cf79-45a5-a366-d379688f99e7","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    tracking_api_test.go:136:   → POST /api/vehicles
+    tracking_api_test.go:136:   ← 201 {"id":"0726cf58-d7dc-4f97-964b-70b344ed6198"}
+    tracking_api_test.go:143:   → POST /api/tracking/location
+    tracking_api_test.go:143:   ← 201 {"confirmed":true,"device_time_trusted":false,"id":"d93527db-d0de-4f43-ac24-b23062e6ea10","suspect":false}
+    tracking_api_test.go:153:   → POST /api/tracking/location
+    tracking_api_test.go:153:   ← 201 {"confirmed":false,"device_time_trusted":false,"id":"28639d16-c139-401e-b97f-50b655499900","suspect":true}
+    tracking_api_test.go:164:   → POST /api/tracking/location
+    tracking_api_test.go:164:   ← 201 {"confirmed":true,"device_time_trusted":false,"id":"d97743fb-a6ce-45d7-af53-a81a57de1e91","suspect":false}
+    tracking_api_test.go:170:   → GET /api/tracking/vehicles/:id/positions?suspect=true
+    tracking_api_test.go:170:   ← 200 {"items":[],"total":0}
+--- PASS: TestTrackingSuspectPositionHandling (1.51s)
+=== RUN   TestTrackingStopEventsEndpoint
+    tracking_api_test.go:178:   → POST /api/auth/login
+    tracking_api_test.go:178:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:50Z"}
+    tracking_api_test.go:179:   → POST /api/facilities
+    tracking_api_test.go:179:   ← 201 {"id":"19a39690-0c0a-42d2-a2b1-0329c9b73903"}
+    tracking_api_test.go:179:   → POST /api/lots
+    tracking_api_test.go:179:   ← 201 {"id":"78bf0268-9a79-416f-8ff9-012c817ca7e5"}
+    tracking_api_test.go:179:   → POST /api/zones
+    tracking_api_test.go:179:   ← 201 {"id":"4cc5a3bf-277f-493f-959d-541645e5c283"}
+    tracking_api_test.go:179:   → POST /api/members
+    tracking_api_test.go:179:   ← 201 {"arrears_balance_cents":0,"created_at":"2026-04-17T16:32:51Z","display_name":"Member Res","id":"55c15c4a-0e8a-4b18-b4b2-a376c9b61f88","organization_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+    tracking_api_test.go:179:   → POST /api/vehicles
+    tracking_api_test.go:179:   ← 201 {"id":"079cb188-c5fe-4d01-a5d5-5f6d4b161659"}
+    tracking_api_test.go:186:   → POST /api/tracking/location
+    tracking_api_test.go:186:   ← 201 {"confirmed":true,"device_time_trusted":false,"id":"895ff2b5-7edc-4355-a935-ec916b76c0b8","suspect":false}
+    tracking_api_test.go:202:   → POST /api/tracking/location
+    tracking_api_test.go:202:   ← 201 {"confirmed":true,"device_time_trusted":false,"id":"f2e48515-e10f-4c10-b3a6-3355f1668bbe","suspect":false}
+    tracking_api_test.go:208:   → GET /api/tracking/vehicles/:id/stops
+    tracking_api_test.go:208:   ← 200 {"items":[{"detected_at":"2026-04-17T16:32:51Z","id":"d5242b20-a827-4c8f-9e9d-294473049cf8","latitude":37.77495,"longitude":-122.41945,"started_at":"2026-04-17T16:29:51Z"}],"total":1}
+--- PASS: TestTrackingStopEventsEndpoint (1.58s)
+=== RUN   TestFormLoginRedirectsAndSetsSessionCookie
+    web_routes_coverage_api_test.go:86:   → POST /auth/login
+    web_routes_coverage_api_test.go:86:   ← 303 
+--- PASS: TestFormLoginRedirectsAndSetsSessionCookie (1.49s)
+=== RUN   TestFormLoginBadCredentialsRedirectsWithError
+    web_routes_coverage_api_test.go:112:   → POST /auth/login (bad creds)
+    web_routes_coverage_api_test.go:112:   ← 303 
+--- PASS: TestFormLoginBadCredentialsRedirectsWithError (1.54s)
+=== RUN   TestFormLogoutClearsSessionAndRedirectsToLogin
+    web_routes_coverage_api_test.go:137:   → POST /auth/logout
+    web_routes_coverage_api_test.go:137:   ← 303 
+--- PASS: TestFormLogoutClearsSessionAndRedirectsToLogin (1.55s)
+=== RUN   TestPageRoutesRenderForAuthenticatedAdmin
+    web_routes_coverage_api_test.go:190:   → POST /api/auth/login
+    web_routes_coverage_api_test.go:190:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:32:56Z"}
+    web_routes_coverage_api_test.go:215:   → GET /dashboard
+    web_routes_coverage_api_test.go:215:   ← 200 
+    web_routes_coverage_api_test.go:215:   → GET /capacity
+    web_routes_coverage_api_test.go:215:   ← 200 
+    web_routes_coverage_api_test.go:215:   → GET /facilities
+    web_routes_coverage_api_test.go:215:   ← 200 
+    web_routes_coverage_api_test.go:215:   → GET /lots
+    web_routes_coverage_api_test.go:215:   ← 200 
+    web_routes_coverage_api_test.go:215:   → GET /zones
+    web_routes_coverage_api_test.go:215:   ← 200 
+    web_routes_coverage_api_test.go:215:   → GET /rate-plans
+    web_routes_coverage_api_test.go:215:   ← 200 
+    web_routes_coverage_api_test.go:215:   → GET /members
+    web_routes_coverage_api_test.go:215:   ← 200 
+    web_routes_coverage_api_test.go:215:   → GET /vehicles
+    web_routes_coverage_api_test.go:215:   ← 200 
+    web_routes_coverage_api_test.go:215:   → GET /drivers
+    web_routes_coverage_api_test.go:215:   ← 200 
+    web_routes_coverage_api_test.go:215:   → GET /notifications
+    web_routes_coverage_api_test.go:215:   ← 200 
+    web_routes_coverage_api_test.go:215:   → GET /campaigns
+    web_routes_coverage_api_test.go:215:   ← 200 
+    web_routes_coverage_api_test.go:215:   → GET /segments
+    web_routes_coverage_api_test.go:215:   ← 200 
+    web_routes_coverage_api_test.go:215:   → GET /tasks
+    web_routes_coverage_api_test.go:215:   ← 200 
+    web_routes_coverage_api_test.go:215:   → GET /notification-prefs
+    web_routes_coverage_api_test.go:215:   ← 200 
+    web_routes_coverage_api_test.go:215:   → GET /analytics
+    web_routes_coverage_api_test.go:215:   ← 200 
+--- PASS: TestPageRoutesRenderForAuthenticatedAdmin (1.66s)
+=== RUN   TestAuditPageRendersForAuditor
+    web_routes_coverage_api_test.go:222:   → POST /api/auth/login
+    web_routes_coverage_api_test.go:222:   ← 200 {"id":"44444444-4444-4444-4444-444444444444","username":"auditor","display_name":"Auditor","status":"active","roles":["auditor"],"force_password_change":false,"created_at":"2026-04-17T16:32:58Z"}
+    web_routes_coverage_api_test.go:225:   → GET /audit (auditor)
+    web_routes_coverage_api_test.go:225:   ← 200 
+--- PASS: TestAuditPageRendersForAuditor (1.55s)
+=== RUN   TestAuditPageRendersForAdmin
+    web_routes_coverage_api_test.go:231:   → POST /api/auth/login
+    web_routes_coverage_api_test.go:231:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:33:00Z"}
+    web_routes_coverage_api_test.go:234:   → GET /audit (admin)
+    web_routes_coverage_api_test.go:234:   ← 200 
+--- PASS: TestAuditPageRendersForAdmin (1.65s)
+=== RUN   TestAdminUsersPageRendersForAdmin
+    web_routes_coverage_api_test.go:240:   → POST /api/auth/login
+    web_routes_coverage_api_test.go:240:   ← 200 {"id":"11111111-1111-1111-1111-111111111111","username":"admin","display_name":"Admin","status":"active","roles":["facility_admin"],"force_password_change":false,"created_at":"2026-04-17T16:33:01Z"}
+    web_routes_coverage_api_test.go:243:   → GET /admin/users (admin)
+    web_routes_coverage_api_test.go:243:   ← 200 
+--- PASS: TestAdminUsersPageRendersForAdmin (1.61s)
+=== RUN   TestPageRoutesRedirectUnauthenticatedToLogin
+    web_routes_coverage_api_test.go:257:   → GET /dashboard (no auth)
+    web_routes_coverage_api_test.go:257:   ← 303 
+    web_routes_coverage_api_test.go:257:   → GET /capacity (no auth)
+    web_routes_coverage_api_test.go:257:   ← 303 
+    web_routes_coverage_api_test.go:257:   → GET /analytics (no auth)
+    web_routes_coverage_api_test.go:257:   ← 303 
+    web_routes_coverage_api_test.go:257:   → GET /audit (no auth)
+    web_routes_coverage_api_test.go:257:   ← 303 
+    web_routes_coverage_api_test.go:257:   → GET /admin/users (no auth)
+    web_routes_coverage_api_test.go:257:   ← 303 
+--- PASS: TestPageRoutesRedirectUnauthenticatedToLogin (1.37s)
+PASS
+ok  	parkops/API_tests	186.206s
+=== RUN   TestLoginPageRendersForm
+--- PASS: TestLoginPageRendersForm (0.00s)
+=== RUN   TestDashboardPageRendersForAllRoles
+--- PASS: TestDashboardPageRendersForAllRoles (0.00s)
+=== RUN   TestDashboardIncludesRoleInfo
+--- PASS: TestDashboardIncludesRoleInfo (0.00s)
+=== RUN   TestReservationsPageRenders
+--- PASS: TestReservationsPageRenders (0.00s)
+=== RUN   TestCapacityPageRenders
+--- PASS: TestCapacityPageRenders (0.00s)
+=== RUN   TestNotificationsPageRenders
+--- PASS: TestNotificationsPageRenders (0.00s)
+=== RUN   TestNotificationPrefsPageUsesCorrectBackendRoutes
+--- PASS: TestNotificationPrefsPageUsesCorrectBackendRoutes (0.00s)
+=== RUN   TestAnalyticsPageExposesAllPivotOptions
+--- PASS: TestAnalyticsPageExposesAllPivotOptions (0.00s)
+=== RUN   TestTasksPageRendersFormAndActions
+--- PASS: TestTasksPageRendersFormAndActions (0.00s)
+=== RUN   TestNavigationGatesAdminOnlyLinksByRole
+--- PASS: TestNavigationGatesAdminOnlyLinksByRole (0.00s)
+=== RUN   TestInitialsForHandlesEdgeCases
+--- PASS: TestInitialsForHandlesEdgeCases (0.00s)
+=== RUN   TestIsNavVisibleEmptyAllowedIsPublic
+--- PASS: TestIsNavVisibleEmptyAllowedIsPublic (0.00s)
+=== RUN   TestIsNavVisibleMatchingRole
+--- PASS: TestIsNavVisibleMatchingRole (0.00s)
+=== RUN   TestCrudPageRendersFieldsAndEndpoint
+--- PASS: TestCrudPageRendersFieldsAndEndpoint (0.00s)
+PASS
+ok  	parkops/internal/web	0.009s

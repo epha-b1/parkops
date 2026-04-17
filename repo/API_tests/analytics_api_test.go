@@ -2,6 +2,7 @@ package API_tests
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"strings"
 	"testing"
@@ -12,6 +13,17 @@ func TestAnalyticsOccupancyEndpoint(t *testing.T) {
 	env := setupAuthAPIEnv(t)
 	admin := loginAs(t, env, "admin", "AdminPass1234")
 
+	// Seed a zone + capacity snapshot so the endpoint has a non-empty result set
+	// and we can assert on the response shape (period/avg_occupancy_pct/peak_occupancy_pct).
+	fx := createReservationFixture(t, env, admin, 10, 15)
+	_, err := env.pool.Exec(context.Background(),
+		`INSERT INTO capacity_snapshots(zone_id, snapshot_at, authoritative_stalls) VALUES ($1::uuid, now(), 7)`,
+		fx.zoneID,
+	)
+	if err != nil {
+		t.Fatalf("seed capacity_snapshot: %v", err)
+	}
+
 	from := time.Now().UTC().Add(-24 * time.Hour).Format(time.RFC3339)
 	to := time.Now().UTC().Add(24 * time.Hour).Format(time.RFC3339)
 
@@ -20,16 +32,65 @@ func TestAnalyticsOccupancyEndpoint(t *testing.T) {
 	if resp.Code != http.StatusOK {
 		t.Fatalf("analytics occupancy failed: %d %s", resp.Code, resp.Body.String())
 	}
+
+	var rows []map[string]any
+	if err := json.Unmarshal(resp.Body.Bytes(), &rows); err != nil {
+		t.Fatalf("decode occupancy response: %v body=%s", err, resp.Body.String())
+	}
+	if len(rows) == 0 {
+		t.Fatalf("expected at least one occupancy bucket, got empty array")
+	}
+	first := rows[0]
+	for _, key := range []string{"period", "avg_occupancy_pct", "peak_occupancy_pct"} {
+		if _, ok := first[key]; !ok {
+			t.Fatalf("occupancy row missing field %q; got %v", key, first)
+		}
+	}
 }
 
 func TestAnalyticsBookingsEndpoint(t *testing.T) {
 	env := setupAuthAPIEnv(t)
 	admin := loginAs(t, env, "admin", "AdminPass1234")
 
+	// Seed a reservation so the bookings pivot has a non-empty result we can
+	// assert on (label/count/total_stalls).
+	fx := createReservationFixture(t, env, admin, 5, 15)
+	start := time.Now().UTC().Add(2 * time.Hour).Truncate(time.Second)
+	end := start.Add(time.Hour)
+	hold := apiRequest(t, env.r, http.MethodPost, "/api/reservations/hold", map[string]any{
+		"zone_id":           fx.zoneID,
+		"member_id":         fx.memberID,
+		"vehicle_id":        fx.vehicleID,
+		"time_window_start": start.Format(time.RFC3339),
+		"time_window_end":   end.Format(time.RFC3339),
+		"stall_count":       1,
+	}, admin)
+	if hold.Code != http.StatusCreated {
+		t.Fatalf("seed hold: %d %s", hold.Code, hold.Body.String())
+	}
+
 	resp := apiRequest(t, env.r, http.MethodGet, "/api/analytics/bookings?pivot_by=time", nil, admin)
 	logStep(t, "GET", "/api/analytics/bookings", resp.Code, resp.Body.String())
 	if resp.Code != http.StatusOK {
 		t.Fatalf("analytics bookings failed: %d %s", resp.Code, resp.Body.String())
+	}
+
+	var rows []map[string]any
+	if err := json.Unmarshal(resp.Body.Bytes(), &rows); err != nil {
+		t.Fatalf("decode bookings response: %v body=%s", err, resp.Body.String())
+	}
+	if len(rows) == 0 {
+		t.Fatalf("expected at least one bookings bucket, got empty array")
+	}
+	first := rows[0]
+	for _, key := range []string{"label", "count", "total_stalls"} {
+		if _, ok := first[key]; !ok {
+			t.Fatalf("bookings row missing field %q; got %v", key, first)
+		}
+	}
+	// count should be numeric > 0 because we seeded one reservation
+	if c, ok := first["count"].(float64); !ok || c < 1 {
+		t.Fatalf("expected count >= 1, got %v", first["count"])
 	}
 }
 
@@ -37,10 +98,45 @@ func TestAnalyticsExceptionsEndpoint(t *testing.T) {
 	env := setupAuthAPIEnv(t)
 	admin := loginAs(t, env, "admin", "AdminPass1234")
 
+	// Seed an exception so the pivot has a row to assert against.
+	org := "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+	_, err := env.pool.Exec(context.Background(), `
+		INSERT INTO devices(id, organization_id, device_key, device_type, status)
+		VALUES ('cc000001-0000-0000-0000-000000000099', $1::uuid, 'ANX-COV-1', 'camera', 'online')
+		ON CONFLICT DO NOTHING
+	`, org)
+	if err != nil {
+		t.Fatalf("seed device: %v", err)
+	}
+	_, err = env.pool.Exec(context.Background(), `
+		INSERT INTO exceptions(device_id, exception_type, status, created_at)
+		VALUES ('cc000001-0000-0000-0000-000000000099'::uuid, 'sensor_offline', 'open', now())
+	`)
+	if err != nil {
+		t.Fatalf("seed exception: %v", err)
+	}
+
 	resp := apiRequest(t, env.r, http.MethodGet, "/api/analytics/exceptions", nil, admin)
 	logStep(t, "GET", "/api/analytics/exceptions", resp.Code, resp.Body.String())
 	if resp.Code != http.StatusOK {
 		t.Fatalf("analytics exceptions failed: %d %s", resp.Code, resp.Body.String())
+	}
+
+	var rows []map[string]any
+	if err := json.Unmarshal(resp.Body.Bytes(), &rows); err != nil {
+		t.Fatalf("decode exceptions response: %v body=%s", err, resp.Body.String())
+	}
+	if len(rows) == 0 {
+		t.Fatalf("expected at least one exceptions bucket, got empty array")
+	}
+	first := rows[0]
+	for _, key := range []string{"exception_type", "count"} {
+		if _, ok := first[key]; !ok {
+			t.Fatalf("exceptions row missing field %q; got %v", key, first)
+		}
+	}
+	if c, ok := first["count"].(float64); !ok || c < 1 {
+		t.Fatalf("expected exception count >= 1, got %v", first["count"])
 	}
 }
 
